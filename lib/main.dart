@@ -43,7 +43,7 @@ class _AppHomeState extends State<AppHome> {
   final tabs = const [
     AppTab('ניהול', Icons.dashboard_rounded),
     AppTab('נהג', Icons.local_taxi_rounded),
-    AppTab('בית', Icons.home_rounded),
+    AppTab('הצעות', Icons.how_to_vote_rounded),
     AppTab('לקוח', Icons.person_rounded),
     AppTab('אמון', Icons.verified_user_rounded),
   ];
@@ -113,6 +113,10 @@ class AppStage extends StatelessWidget {
       return const DriverLiveScene();
     }
 
+    if (selected == 2) {
+      return const DriverOffersScene();
+    }
+
     final title = switch (selected) {
       0 => 'לוח בקרה',
       1 => 'אני על הקו',
@@ -165,6 +169,264 @@ class AppStage extends StatelessWidget {
 enum PhoneMode { home, customer, driver, admin, trust }
 
 
+
+
+class DriverOffersScene extends StatelessWidget {
+  const DriverOffersScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 30,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('הקריאה שלך פתוחה'),
+                const SizedBox(height: 18),
+                Text(
+                  '3 נהגים הגיבו',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 48 : 72,
+                    height: .92,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GlassPanel(
+                  radius: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: const [
+                        OfferStatusHeart(),
+                        SizedBox(height: 18),
+                        DriverOfferReferenceCard(
+                          name: 'אבי',
+                          eta: '4 דק׳',
+                          trust: '96%',
+                          badge: 'הצעה משתלמת',
+                          tone: OfferTone.green,
+                        ),
+                        SizedBox(height: 12),
+                        DriverOfferReferenceCard(
+                          name: 'רפי',
+                          eta: '7 דק׳',
+                          trust: '98%',
+                          badge: 'הצעה טובה',
+                          tone: OfferTone.green,
+                        ),
+                        SizedBox(height: 12),
+                        DriverOfferReferenceCard(
+                          name: 'משה',
+                          eta: '11 דק׳',
+                          trust: '99%',
+                          badge: 'נהג זהב',
+                          tone: OfferTone.gold,
+                        ),
+                        SizedBox(height: 18),
+                        NeonButton(label: 'בחר הצעה'),
+                        SizedBox(height: 12),
+                        Text(
+                          'נהגים שאומתו על ידי קו פתוח',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OfferStatusHeart extends StatelessWidget {
+  const OfferStatusHeart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 86,
+          height: 86,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: kGreen.withOpacity(.10),
+            border: Border.all(color: kGreenSoft.withOpacity(.45)),
+            boxShadow: [
+              BoxShadow(color: kGreen.withOpacity(.28), blurRadius: 48),
+            ],
+          ),
+          child: const Icon(Icons.favorite_rounded, color: kGreenSoft, size: 38),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'בחר נהג לפי אמון, זמן והצעה',
+          style: TextStyle(
+            color: Colors.white70,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum OfferTone { green, gold }
+
+class DriverOfferReferenceCard extends StatelessWidget {
+  final String name;
+  final String eta;
+  final String trust;
+  final String badge;
+  final OfferTone tone;
+
+  const DriverOfferReferenceCard({
+    required this.name,
+    required this.eta,
+    required this.trust,
+    required this.badge,
+    required this.tone,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = tone == OfferTone.gold ? kGold : kGreenSoft;
+    final icon = tone == OfferTone.gold ? Icons.workspace_premium_rounded : Icons.verified_rounded;
+
+    return GlassPanel(
+      height: 112,
+      radius: 28,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            DriverAvatar(accent: accent),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$name · $eta · אמון $trust',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Row(
+                    children: List.generate(
+                      5,
+                      (index) => const Icon(Icons.star_rounded, color: kGold, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(icon, color: accent, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        badge,
+                        style: TextStyle(
+                          color: accent,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              eta.replaceAll(' דק׳', ''),
+              style: TextStyle(
+                color: accent,
+                fontSize: 42,
+                fontWeight: FontWeight.w900,
+                height: .9,
+              ),
+            ),
+            const SizedBox(width: 3),
+            Text(
+              'דק׳',
+              style: TextStyle(
+                color: accent,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DriverAvatar extends StatelessWidget {
+  final Color accent;
+
+  const DriverAvatar({required this.accent, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF101B28),
+            border: Border.all(color: accent, width: 2),
+            boxShadow: [
+              BoxShadow(color: accent.withOpacity(.25), blurRadius: 26),
+            ],
+          ),
+          child: Icon(Icons.person_rounded, color: Colors.white.withOpacity(.86), size: 34),
+        ),
+        Positioned(
+          right: -2,
+          bottom: -2,
+          child: Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: accent,
+              border: Border.all(color: kPhone, width: 2),
+            ),
+            child: const Icon(Icons.check_rounded, color: Color(0xFF03120B), size: 15),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class DriverLiveScene extends StatelessWidget {
   const DriverLiveScene({super.key});
