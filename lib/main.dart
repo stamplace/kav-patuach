@@ -11,9 +11,49 @@ const kGold = Color(0xFFE7B85B);
 
 enum VisualMode { night, day }
 
+
+const kavNightCityAsset = kavNightCityAsset;
+const kavDayCityAsset = kavDayCityAsset;
+const kavMapDarkAsset = kavMapDarkAsset;
+const kavMapLightAsset = kavMapLightAsset;
+const kavGlowAsset = kavGlowAsset;
+const kavHeroNightAsset = kavHeroNightAsset;
+
+const kavAllPremiumAssets = [
+  kavNightCityAsset,
+  kavDayCityAsset,
+  kavMapDarkAsset,
+  kavMapLightAsset,
+  kavGlowAsset,
+  kavHeroNightAsset,
+];
+
+Image premiumAssetImage(
+  String asset, {
+  BoxFit fit = BoxFit.cover,
+  Alignment alignment = Alignment.center,
+  double? opacity,
+  int? cacheWidth,
+  int? cacheHeight,
+}) {
+  return Image.asset(
+    asset,
+    fit: fit,
+    alignment: alignment,
+    filterQuality: FilterQuality.medium,
+    gaplessPlayback: true,
+    cacheWidth: cacheWidth,
+    cacheHeight: cacheHeight,
+    opacity: opacity == null ? null : AlwaysStoppedAnimation(opacity),
+    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+  );
+}
+
+
 // OVERLAY_TUNING_PASS_01: premium image assets are the visual base; UI must stay thin and readable.
 // VISUAL_COMPOSITION_PASS_02: assets lead, old painters are reduced, trust poster has priority.
 // TRUST_DAY_NIGHT_FIX_01: trust uses poster at night and day-city in day mode until a dedicated day poster exists.
+// ASSET_PERFORMANCE_PASS_01: preload image assets and use gapless playback to prevent tearing on fast taps.
 
 
 
@@ -52,10 +92,10 @@ class PremiumAssetBackground extends StatelessWidget {
     final isDay = mode == VisualMode.day;
 
     final asset = scene == 4 && !isDay
-        ? 'assets/brand/kav-hero-poster-night.webp'
+        ? kavHeroNightAsset
         : isDay
-            ? 'assets/brand/kav-day-city.webp'
-            : 'assets/brand/kav-night-city.webp';
+            ? kavDayCityAsset
+            : kavNightCityAsset;
 
     return Stack(
       children: [
@@ -65,25 +105,23 @@ class PremiumAssetBackground extends StatelessWidget {
         Positioned.fill(
           child: Transform.scale(
             scale: isDay ? 1.04 : 1.07,
-            child: Image.asset(
+            child: premiumAssetImage(
               asset,
               fit: BoxFit.cover,
               alignment: isDay ? Alignment.center : const Alignment(0, -0.07),
-              filterQuality: FilterQuality.high,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              cacheWidth: 1440,
             ),
           ),
         ),
 
         // Premium glow: now controlled, not flooding the whole UI.
         Positioned.fill(
-          child: Image.asset(
-            'assets/brand/kav-premium-glow.webp',
+          child: premiumAssetImage(
+            kavGlowAsset,
             fit: BoxFit.cover,
             alignment: Alignment.center,
-            opacity: AlwaysStoppedAnimation(isDay ? .055 : .16),
-            filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            opacity: isDay ? .055 : .16,
+            cacheWidth: 1440,
           ),
         ),
 
@@ -145,18 +183,17 @@ class PremiumMapSurface extends StatelessWidget {
     final mode = VisualModeScope.maybeOf(context);
     final isDay = mode == VisualMode.day;
     final asset = isDay
-        ? 'assets/brand/kav-map-light.webp'
-        : 'assets/brand/kav-map-dark.webp';
+        ? kavMapLightAsset
+        : kavMapDarkAsset;
 
     return Stack(
       children: [
         Positioned.fill(
-          child: Image.asset(
+          child: premiumAssetImage(
             asset,
             fit: BoxFit.cover,
             alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-            errorBuilder: (_, __, ___) => Container(color: const Color(0xFF03101A)),
+            cacheWidth: 1200,
           ),
         ),
 
@@ -233,6 +270,19 @@ class AppHome extends StatefulWidget {
 class _AppHomeState extends State<AppHome> {
   int selected = 3;
   VisualMode visualMode = VisualMode.night;
+  bool _didPrecacheAssets = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_didPrecacheAssets) return;
+    _didPrecacheAssets = true;
+
+    for (final asset in kavAllPremiumAssets) {
+      precacheImage(AssetImage(asset), context);
+    }
+  }
 
   final tabs = const [
     AppTab('ניהול', Icons.dashboard_rounded),
