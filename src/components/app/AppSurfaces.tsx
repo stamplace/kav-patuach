@@ -1,4 +1,5 @@
 import { ProductShell } from "@/components/ProductShell";
+import { ActionPanel, AppField, NeonButton, RouteCard, SegmentControl } from "@/components/app/AppControls";
 import {
   GlowCard,
   LiveMap,
@@ -51,21 +52,6 @@ function PhoneTop() {
   );
 }
 
-function PrimaryAction({ children }: { children: string }) {
-  return (
-    <button className="w-full rounded-[1.7rem] bg-emerald-400 p-5 text-3xl font-black text-[#03120b] shadow-[0_0_48px_rgba(16,185,129,.34)]">
-      {children}
-    </button>
-  );
-}
-
-function Field({ label }: { label: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/35 p-5 text-xl font-bold text-slate-200">
-      {label}
-    </div>
-  );
-}
 
 export function HomeSurface() {
   return (
@@ -123,17 +109,14 @@ export function CustomerSurface() {
 
           <div className="mt-7 rounded-[2rem] border border-white/10 bg-white/[0.045] p-5">
             <div className="space-y-4">
-              <Field label="מאיפה אוספים אותך?" />
-              <Field label="יעד הנסיעה" />
-              <div className="grid grid-cols-2 gap-3">
-                <button className="rounded-2xl border border-emerald-300 bg-emerald-400/10 p-4 text-xl font-black text-emerald-200">עכשיו</button>
-                <button className="rounded-2xl border border-white/10 bg-black/30 p-4 text-xl font-black text-slate-400">מאוחר יותר</button>
-              </div>
+              <AppField label="איסוף" value="המיקום הנוכחי" />
+              <AppField label="יעד" value="לאן נוסעים?" />
+              <SegmentControl />
             </div>
 
             <LiveMap className="mt-5 h-56" />
             <div className="mt-5">
-              <PrimaryAction>פתח קריאה</PrimaryAction>
+              <NeonButton>פתח קריאה</NeonButton>
             </div>
           </div>
         </PhoneFrame>
@@ -177,19 +160,13 @@ export function DriverSurface() {
           <AppHeader title="קריאות" badge="עבודה חיה" />
           <div className="grid gap-4">
             {liveCalls.map((call) => (
-              <GlowCard key={call.route} className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-                <div>
-                  <StatusPill tone="emerald">{call.status}</StatusPill>
-                  <h2 className="mt-3 text-3xl font-black">{call.route}</h2>
-                  <p className="mt-2 text-slate-300">{call.eta} ממך</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-4xl font-black text-amber-200">{call.value}</span>
-                  <button className="rounded-2xl bg-emerald-400 px-6 py-4 text-xl font-black text-[#03120b]">
-                    קבל
-                  </button>
-                </div>
-              </GlowCard>
+              <RouteCard
+                key={call.route}
+                route={call.route}
+                eta={call.eta}
+                value={call.value}
+                status={call.status}
+              />
             ))}
           </div>
         </div>
