@@ -133,6 +133,10 @@ class AppStage extends StatelessWidget {
       _ => 'נוסעים בטוח.',
     };
 
+    if (selected == 4) {
+      return const TrustReferenceScene();
+    }
+
     final phoneMode = switch (selected) {
       0 => PhoneMode.admin,
       1 => PhoneMode.driver,
@@ -170,6 +174,251 @@ enum PhoneMode { home, customer, driver, admin, trust }
 
 
 
+
+
+class TrustReferenceScene extends StatelessWidget {
+  const TrustReferenceScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 30,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('בטוח ומאומת'),
+                const SizedBox(height: 18),
+                Text(
+                  'שכבת האמון',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 50 : 74,
+                    height: .92,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GlassPanel(
+                  radius: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: const [
+                        TrustSealLarge(),
+                        SizedBox(height: 18),
+                        TrustScorePanel(),
+                        SizedBox(height: 16),
+                        TrustCapabilityGrid(),
+                        SizedBox(height: 16),
+                        TrustBottomPromise(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrustSealLarge extends StatelessWidget {
+  const TrustSealLarge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 142,
+      height: 142,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: kGold.withOpacity(.08),
+        border: Border.all(color: kGold.withOpacity(.55), width: 2),
+        boxShadow: [
+          BoxShadow(color: kGold.withOpacity(.22), blurRadius: 70),
+          BoxShadow(color: kGreen.withOpacity(.16), blurRadius: 90),
+        ],
+      ),
+      child: const Icon(Icons.verified_user_rounded, color: kGold, size: 72),
+    );
+  }
+}
+
+class TrustScorePanel extends StatelessWidget {
+  const TrustScorePanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 126,
+      radius: 30,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'מדד אמון',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(
+            '98%',
+            style: TextStyle(
+              color: kGreenSoft,
+              fontSize: 58,
+              height: .9,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TrustCapabilityGrid extends StatelessWidget {
+  const TrustCapabilityGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        Row(
+          children: [
+            Expanded(
+              child: TrustCapabilityCard(
+                icon: Icons.person_rounded,
+                title: 'נהג מאומת',
+                value: 'מאושר',
+                accent: kGreenSoft,
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: TrustCapabilityCard(
+                icon: Icons.description_rounded,
+                title: 'מסמכים',
+                value: 'נבדקו',
+                accent: kGreenSoft,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: TrustCapabilityCard(
+                icon: Icons.local_taxi_rounded,
+                title: 'נסיעות',
+                value: '+247',
+                accent: kGreenSoft,
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: TrustCapabilityCard(
+                icon: Icons.star_rounded,
+                title: 'לקוחות',
+                value: '4.9/5',
+                accent: kGold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class TrustCapabilityCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color accent;
+
+  const TrustCapabilityCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 124,
+      radius: 26,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: accent, size: 30),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TrustBottomPromise extends StatelessWidget {
+  const TrustBottomPromise({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 62,
+      radius: 31,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.lock_rounded, color: kGold, size: 22),
+          SizedBox(width: 8),
+          Text(
+            'פרטיות · אימות · שירות אנושי',
+            style: TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class DriverOffersScene extends StatelessWidget {
   const DriverOffersScene({super.key});
