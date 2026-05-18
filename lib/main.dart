@@ -125,10 +125,14 @@ class AppStage extends StatelessWidget {
       _ => 'שכבת אמון',
     };
 
+    if (selected == 2) {
+      return const DriverZoneScene();
+    }
+
     final subtitle = switch (selected) {
       0 => 'קריאות. נהגים. אמון.',
       1 => 'קריאות חיות באזור.',
-      2 => 'קריאה. נהג. נסיעה.',
+      2 => 'מרחב נהגים חי.',
       3 => 'פתח קריאה ובחר נהג.',
       _ => 'נוסעים בטוח.',
     };
@@ -175,6 +179,324 @@ enum PhoneMode { home, customer, driver, admin, trust }
 
 
 
+
+
+class DriverZoneScene extends StatelessWidget {
+  const DriverZoneScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 30,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('מרחב נהגים'),
+                const SizedBox(height: 18),
+                Text(
+                  'אזור חי',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 54 : 78,
+                    height: .9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GlassPanel(
+                  radius: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: compact ? 390 : 470,
+                          child: const ZoneMapCanvas(),
+                        ),
+                        const SizedBox(height: 18),
+                        const ZoneStatsStrip(),
+                        const SizedBox(height: 16),
+                        const ZoneEventRow(
+                          icon: Icons.local_taxi_rounded,
+                          title: 'קריאה חדשה',
+                          value: 'בני ברק · 4 דק׳',
+                          accent: kGreenSoft,
+                        ),
+                        const SizedBox(height: 10),
+                        const ZoneEventRow(
+                          icon: Icons.groups_rounded,
+                          title: 'נהגים על הקו',
+                          value: '86 פעילים',
+                          accent: kGold,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ZoneMapCanvas extends StatelessWidget {
+  const ZoneMapCanvas({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: CustomPaint(
+        painter: ZoneMapPainter(),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class ZoneMapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bg = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF04101B), Color(0xFF08231F), Color(0xFF020711)],
+      ).createShader(Offset.zero & size);
+
+    canvas.drawRect(Offset.zero & size, bg);
+
+    final grid = Paint()
+      ..color = Colors.white.withOpacity(.065)
+      ..strokeWidth = 1;
+
+    for (double x = 0; x < size.width; x += 36) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
+    }
+    for (double y = 0; y < size.height; y += 36) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+    }
+
+    final zonePath = Path()
+      ..moveTo(size.width * .20, size.height * .28)
+      ..quadraticBezierTo(size.width * .50, size.height * .08, size.width * .78, size.height * .30)
+      ..quadraticBezierTo(size.width * .88, size.height * .58, size.width * .64, size.height * .80)
+      ..quadraticBezierTo(size.width * .34, size.height * .92, size.width * .16, size.height * .62)
+      ..quadraticBezierTo(size.width * .08, size.height * .42, size.width * .20, size.height * .28);
+
+    canvas.drawPath(
+      zonePath,
+      Paint()
+        ..color = kGreen.withOpacity(.08)
+        ..style = PaintingStyle.fill,
+    );
+
+    canvas.drawPath(
+      zonePath,
+      Paint()
+        ..color = kGreenSoft.withOpacity(.58)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
+    );
+
+    final route = Paint()
+      ..color = kGreen.withOpacity(.50)
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    final routePath = Path()
+      ..moveTo(size.width * .18, size.height * .72)
+      ..cubicTo(
+        size.width * .38,
+        size.height * .58,
+        size.width * .45,
+        size.height * .28,
+        size.width * .72,
+        size.height * .34,
+      );
+
+    canvas.drawPath(routePath, route);
+
+    _driver(canvas, size, Offset(.28, .36), 'אבי');
+    _driver(canvas, size, Offset(.66, .30), 'רפי');
+    _driver(canvas, size, Offset(.76, .58), 'משה');
+    _driver(canvas, size, Offset(.36, .74), 'יוסי');
+    _call(canvas, size, Offset(.52, .52));
+    _label(canvas, 'אזור בני ברק', Offset(size.width * .66, size.height * .14), kGreenSoft);
+    _label(canvas, 'קריאה חדשה', Offset(size.width * .56, size.height * .58), kGold);
+  }
+
+  void _driver(Canvas canvas, Size size, Offset unit, String label) {
+    final pos = Offset(size.width * unit.dx, size.height * unit.dy);
+    final glow = Paint()
+      ..color = kGreen.withOpacity(.20)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+
+    canvas.drawCircle(pos, 30, glow);
+    canvas.drawCircle(pos, 11, Paint()..color = kGreenSoft);
+
+    _label(canvas, label, pos.translate(36, -12), kGreenSoft);
+  }
+
+  void _call(Canvas canvas, Size size, Offset unit) {
+    final pos = Offset(size.width * unit.dx, size.height * unit.dy);
+    canvas.drawCircle(
+      pos,
+      52,
+      Paint()
+        ..color = kGold.withOpacity(.14)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 28),
+    );
+    canvas.drawCircle(pos, 24, Paint()..color = kGold.withOpacity(.22));
+    canvas.drawCircle(pos, 11, Paint()..color = kGold);
+  }
+
+  void _label(Canvas canvas, String text, Offset offset, Color accent) {
+    final textPainter = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(
+        text: text,
+        style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.w900),
+      ),
+    )..layout();
+
+    final rect = Rect.fromLTWH(offset.dx - textPainter.width - 16, offset.dy - 15, textPainter.width + 32, 32);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(16)),
+      Paint()..color = Colors.black.withOpacity(.62),
+    );
+
+    textPainter.paint(canvas, Offset(rect.left + 16, rect.top + 8));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class ZoneStatsStrip extends StatelessWidget {
+  const ZoneStatsStrip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: ZoneStat(label: 'נהגים', value: '86', icon: Icons.local_taxi_rounded)),
+        SizedBox(width: 10),
+        Expanded(child: ZoneStat(label: 'קריאות', value: '24', icon: Icons.radio_button_checked_rounded)),
+        SizedBox(width: 10),
+        Expanded(child: ZoneStat(label: 'אזור', value: 'חם', icon: Icons.local_fire_department_rounded)),
+      ],
+    );
+  }
+}
+
+class ZoneStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const ZoneStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 90,
+      radius: 24,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: kGreenSoft, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: kGreenSoft,
+              fontSize: 23,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white60,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ZoneEventRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color accent;
+
+  const ZoneEventRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 74,
+      radius: 24,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Icon(icon, color: accent, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: TextStyle(
+                color: accent,
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class TrustReferenceScene extends StatelessWidget {
   const TrustReferenceScene({super.key});
