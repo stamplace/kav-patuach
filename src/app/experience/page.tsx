@@ -3,18 +3,16 @@ import { GlowCard, LiveMap, MetricCard, PhoneFrame, StatusPill, TrustBadge } fro
 
 export default function Experience() {
   return (
-    <ProductShell active="experience" badge="חוויה מלאה">
+    <ProductShell active="experience" badge="חוויה">
       <section className="grid gap-8">
         <section className="grid min-h-[72vh] gap-10 lg:grid-cols-[1fr_460px] lg:items-center">
           <div>
-            <StatusPill tone="emerald">אפליקציה חיה</StatusPill>
+            <StatusPill tone="emerald">Live Network</StatusPill>
             <h1 className="mt-6 text-7xl font-black leading-[.9] tracking-tight sm:text-9xl">
-              מערכת אחת.
-              <br />
-              ארבעה קצוות.
+              קו פתוח
             </h1>
             <p className="mt-7 max-w-2xl text-3xl font-black leading-tight text-slate-100">
-              לקוח פותח קריאה. נהג מגיב. מנהל שומר אמון.
+              קריאה. נהג. נסיעה.
             </p>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -48,7 +46,7 @@ export default function Experience() {
           {[
             { href: "/customer", title: "לקוח", action: "פתח קריאה" },
             { href: "/driver", title: "נהג", action: "אני על הקו" },
-            { href: "/admin", title: "מנהל", action: "לוח בקרה" },
+            { href: "/admin", title: "ניהול", action: "לוח בקרה" },
           ].map((item) => (
             <a key={item.href} href={item.href} className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/25 transition hover:-translate-y-1 hover:bg-white/[0.08]">
               <p className="text-sm font-black text-emerald-300">{item.title}</p>

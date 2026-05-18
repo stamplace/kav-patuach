@@ -72,12 +72,12 @@ export function HomeSurface() {
     <ProductShell active="home" badge="קו פתוח">
       <section className="grid min-h-[76vh] gap-10 lg:grid-cols-[1fr_460px] lg:items-center">
         <div>
-          <StatusPill tone="emerald">רשת קריאות לנהגים ולקוחות</StatusPill>
+          <StatusPill tone="emerald">Live Network</StatusPill>
           <h1 className="mt-6 text-7xl font-black leading-[.9] tracking-tight sm:text-9xl">
             קו <span className="text-emerald-400">פתוח</span>
           </h1>
           <p className="mt-7 max-w-2xl text-3xl font-black leading-tight">
-            פותחים קריאה. בוחרים נהג. נוסעים יחד.
+            קריאה. נהג. נסיעה.
           </p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
@@ -85,7 +85,7 @@ export function HomeSurface() {
               { href: "/customer", title: "פתח קריאה" },
               { href: "/driver", title: "אני על הקו" },
               { href: "/admin", title: "לוח בקרה" },
-              { href: "/experience", title: "חוויה מלאה" },
+              { href: "/experience", title: "חוויה" },
             ].map((item) => (
               <a key={item.href} href={item.href} className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-6 text-2xl font-black shadow-2xl shadow-black/25 transition hover:-translate-y-1 hover:bg-white/[0.08]">
                 {item.title}
@@ -139,7 +139,7 @@ export function CustomerSurface() {
         </PhoneFrame>
 
         <div>
-          <AppHeader title="נהגים זמינים" badge="3 תגובות" />
+          <AppHeader title="נהגים" badge="3 תגובות" />
           <div className="grid gap-4 md:grid-cols-3">
             {driverOffers.map((offer) => (
               <DriverOfferCard key={offer.name} {...offer} />
@@ -174,7 +174,7 @@ export function DriverSurface() {
         </PhoneFrame>
 
         <div>
-          <AppHeader title="קריאות באזור" badge="עבודה חיה" />
+          <AppHeader title="קריאות" badge="עבודה חיה" />
           <div className="grid gap-4">
             {liveCalls.map((call) => (
               <GlowCard key={call.route} className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
@@ -202,7 +202,7 @@ export function AdminSurface() {
   return (
     <ProductShell active="admin" badge="ניהול">
       <section>
-        <AppHeader title="לוח בקרה" badge="Command Center" />
+        <AppHeader title="לוח בקרה" badge="ניהול" />
 
         <div className="grid gap-4 md:grid-cols-4">
           {adminMetrics.map((metric) => (
