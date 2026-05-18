@@ -12,12 +12,12 @@ const kGold = Color(0xFFE7B85B);
 enum VisualMode { night, day }
 
 
-const kavNightCityAsset = kavNightCityAsset;
-const kavDayCityAsset = kavDayCityAsset;
-const kavMapDarkAsset = kavMapDarkAsset;
-const kavMapLightAsset = kavMapLightAsset;
-const kavGlowAsset = kavGlowAsset;
-const kavHeroNightAsset = kavHeroNightAsset;
+const kavNightCityAsset = 'assets/brand/kav-night-city.webp';
+const kavDayCityAsset = 'assets/brand/kav-day-city.webp';
+const kavMapDarkAsset = 'assets/brand/kav-map-dark.webp';
+const kavMapLightAsset = 'assets/brand/kav-map-light.webp';
+const kavGlowAsset = 'assets/brand/kav-premium-glow.webp';
+const kavHeroNightAsset = 'assets/brand/kav-hero-poster-night.webp';
 
 const kavAllPremiumAssets = [
   kavNightCityAsset,
