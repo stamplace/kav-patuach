@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import { product } from "@/lib/product";
 
 type ProductShellProps = {
-  active: "premium" | "landing" | "customer" | "driver" | "admin";
+  active: "premium" | "experience" | "landing" | "customer" | "driver" | "admin";
   badge: string;
   children: ReactNode;
 };
 
 const navItems = [
   { key: "premium", label: "פרימיום", href: "/premium" },
+  { key: "experience", label: "חוויה", href: "/experience" },
   { key: "customer", label: "לקוח", href: "/customer" },
   { key: "driver", label: "נהג", href: "/driver" },
   { key: "admin", label: "מנהל", href: "/admin" },
