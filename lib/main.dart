@@ -38,7 +38,7 @@ class AppHome extends StatefulWidget {
 }
 
 class _AppHomeState extends State<AppHome> {
-  int selected = 2;
+  int selected = 3;
 
   final tabs = const [
     AppTab('ניהול', Icons.dashboard_rounded),
@@ -105,6 +105,10 @@ class AppStage extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 760;
 
+    if (selected == 3) {
+      return const CustomerBookingScene();
+    }
+
     final title = switch (selected) {
       0 => 'לוח בקרה',
       1 => 'אני על הקו',
@@ -155,6 +159,110 @@ class AppStage extends StatelessWidget {
 }
 
 enum PhoneMode { home, customer, driver, admin, trust }
+
+
+class CustomerBookingScene extends StatelessWidget {
+  const CustomerBookingScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 820),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 34,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('לקוח'),
+                const SizedBox(height: 18),
+                Text(
+                  'לאן נוסעים?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 54 : 76,
+                    height: .9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                GlassPanel(
+                  radius: 34,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: [
+                        const AppInput(label: 'מאיפה אוספים אותך?'),
+                        const SizedBox(height: 12),
+                        const AppInput(label: 'יעד הנסיעה'),
+                        const SizedBox(height: 12),
+                        const SegmentRow(),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: compact ? 230 : 330,
+                          child: const LiveMapCanvas(),
+                        ),
+                        const SizedBox(height: 18),
+                        const NeonButton(label: 'פתח קריאה'),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const TrustStrip(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TrustStrip extends StatelessWidget {
+  const TrustStrip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 58,
+      radius: 29,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.verified_user_rounded, color: kGold, size: 24),
+          SizedBox(width: 10),
+          Text(
+            'נהגים נבחרים',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+          ),
+          SizedBox(width: 12),
+          Text('·', style: TextStyle(color: kGold, fontWeight: FontWeight.w900)),
+          SizedBox(width: 12),
+          Text(
+            'ביטוח מלא',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+          ),
+          SizedBox(width: 12),
+          Text('·', style: TextStyle(color: kGold, fontWeight: FontWeight.w900)),
+          SizedBox(width: 12),
+          Text(
+            'דירוגים אמיתיים',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class CityBackdrop extends StatelessWidget {
   const CityBackdrop({super.key});
