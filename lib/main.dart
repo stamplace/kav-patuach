@@ -54,6 +54,7 @@ Image premiumAssetImage(
 // VISUAL_COMPOSITION_PASS_02: assets lead, old painters are reduced, trust poster has priority.
 // TRUST_DAY_NIGHT_FIX_01: trust uses poster at night and day-city in day mode until a dedicated day poster exists.
 // ASSET_PERFORMANCE_PASS_01: preload image assets and use gapless playback to prevent tearing on fast taps.
+// USE_CASE_PASS_01_CUSTOMER: customer tab is a clear ride request workflow.
 
 
 
@@ -1804,6 +1805,7 @@ class DriverLiveCallCard extends StatelessWidget {
   }
 }
 
+
 class CustomerBookingScene extends StatelessWidget {
   const CustomerBookingScene({super.key});
 
@@ -1819,48 +1821,16 @@ class CustomerBookingScene extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 820),
           child: Padding(
             padding: EdgeInsets.only(
-              top: compact ? 8 : 34,
-              bottom: 12,
+              top: compact ? 6 : 24,
+              bottom: 10,
             ),
             child: Column(
-              children: [
-                const GlassLabel('לקוח'),
-                const SizedBox(height: 12),
-                Text(
-                  'לאן נוסעים?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: compact ? 32 : 42,
-                    height: 1.08,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.6,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GlassPanel(
-                  radius: 20,
-                  child: Padding(
-                    padding: EdgeInsets.all(compact ? 14 : 18),
-                    child: Column(
-                      children: [
-                        const AppInput(label: 'מאיפה אוספים אותך?'),
-                        const SizedBox(height: 12),
-                        const AppInput(label: 'יעד הנסיעה'),
-                        const SizedBox(height: 12),
-                        const SegmentRow(),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: compact ? 220 : 300,
-                          child: const LiveMapCanvas(),
-                        ),
-                        const SizedBox(height: 12),
-                        const NeonButton(label: 'פתח קריאה'),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const TrustStrip(),
+              children: const [
+                CustomerActionHeader(),
+                SizedBox(height: 12),
+                CustomerRequestPanel(),
+                SizedBox(height: 12),
+                TrustStrip(),
               ],
             ),
           ),
@@ -1869,6 +1839,212 @@ class CustomerBookingScene extends StatelessWidget {
     );
   }
 }
+
+class CustomerActionHeader extends StatelessWidget {
+  const CustomerActionHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 20,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: kGreen.withOpacity(.10),
+                border: Border.all(color: kGreenSoft.withOpacity(.30)),
+              ),
+              child: const Icon(Icons.near_me_rounded, color: kGreenSoft, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'פתיחת קריאה',
+                    style: TextStyle(
+                      fontSize: 22,
+                      height: 1.05,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -.2,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'בחר איסוף, יעד וזמן — המערכת תמצא נהג מתאים.',
+                    style: TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            CustomerStatusPill(label: 'זמין'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomerStatusPill extends StatelessWidget {
+  final String label;
+
+  const CustomerStatusPill({
+    required this.label,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: kGreen.withOpacity(.12),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: kGreenSoft.withOpacity(.35)),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: kGreenSoft,
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class CustomerRequestPanel extends StatelessWidget {
+  const CustomerRequestPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 22,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: const [
+            AppInput(label: 'נקודת איסוף'),
+            SizedBox(height: 10),
+            AppInput(label: 'יעד הנסיעה'),
+            SizedBox(height: 10),
+            SegmentRow(),
+            SizedBox(height: 12),
+            CustomerRideSummary(),
+            SizedBox(height: 12),
+            SizedBox(
+              height: 214,
+              child: LiveMapCanvas(),
+            ),
+            SizedBox(height: 12),
+            NeonButton(label: 'פתח קריאה'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomerRideSummary extends StatelessWidget {
+  const CustomerRideSummary({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(
+          child: CustomerMiniMetric(
+            icon: Icons.schedule_rounded,
+            label: 'הגעה',
+            value: '4 דק׳',
+            accent: kGreenSoft,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: CustomerMiniMetric(
+            icon: Icons.route_rounded,
+            label: 'מסלול',
+            value: '8.6 ק״מ',
+            accent: kGreenSoft,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: CustomerMiniMetric(
+            icon: Icons.verified_user_rounded,
+            label: 'אמון',
+            value: '98%',
+            accent: kGold,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CustomerMiniMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accent;
+
+  const CustomerMiniMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 62,
+      radius: 14,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: accent, size: 17),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF8793A0),
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class TrustStrip extends StatelessWidget {
   const TrustStrip({super.key});
