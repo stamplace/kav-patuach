@@ -55,6 +55,7 @@ Image premiumAssetImage(
 // TRUST_DAY_NIGHT_FIX_01: trust uses poster at night and day-city in day mode until a dedicated day poster exists.
 // ASSET_PERFORMANCE_PASS_01: preload image assets and use gapless playback to prevent tearing on fast taps.
 // USE_CASE_PASS_01_CUSTOMER: customer tab is a clear ride request workflow.
+// USE_CASE_PASS_02_DRIVER: driver tab is a clear live work console.
 
 
 
@@ -1572,6 +1573,7 @@ class DriverAvatar extends StatelessWidget {
   }
 }
 
+
 class DriverLiveScene extends StatelessWidget {
   const DriverLiveScene({super.key});
 
@@ -1584,59 +1586,17 @@ class DriverLiveScene extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 920),
+          constraints: const BoxConstraints(maxWidth: 880),
           child: Padding(
             padding: EdgeInsets.only(
-              top: compact ? 8 : 30,
-              bottom: 12,
+              top: compact ? 6 : 24,
+              bottom: 10,
             ),
             child: Column(
-              children: [
-                const GlassLabel('נהג'),
-                const SizedBox(height: 12),
-                Text(
-                  'אני על הקו',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: compact ? 32 : 42,
-                    height: 1.08,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.6,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GlassPanel(
-                  radius: 22,
-                  child: Padding(
-                    padding: EdgeInsets.all(compact ? 14 : 18),
-                    child: Column(
-                      children: [
-                        const NeonSwitch(),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: compact ? 250 : 330,
-                          child: const LiveMapCanvas(),
-                        ),
-                        const SizedBox(height: 12),
-                        const DriverLiveStatsStrip(),
-                        const SizedBox(height: 16),
-                        const DriverLiveCallCard(
-                          title: 'קריאה קרובה',
-                          route: 'בני ברק → פתח תקווה',
-                          eta: '4 דק׳ ממך',
-                          price: '₪68',
-                        ),
-                        const SizedBox(height: 10),
-                        const DriverLiveCallCard(
-                          title: 'קריאה משתלמת',
-                          route: 'רמת גן → ירושלים',
-                          eta: '9 דק׳ ממך',
-                          price: '₪240',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              children: const [
+                DriverActionHeader(),
+                SizedBox(height: 12),
+                DriverWorkPanel(),
               ],
             ),
           ),
@@ -1646,58 +1606,86 @@ class DriverLiveScene extends StatelessWidget {
   }
 }
 
-class DriverLiveStatsStrip extends StatelessWidget {
-  const DriverLiveStatsStrip({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(child: DriverStatBox(label: 'הכנסה היום', value: '₪740', icon: Icons.payments_rounded)),
-        SizedBox(width: 10),
-        Expanded(child: DriverStatBox(label: 'אמון הנהג', value: '98%', icon: Icons.verified_user_rounded)),
-        SizedBox(width: 10),
-        Expanded(child: DriverStatBox(label: 'קריאות', value: '12', icon: Icons.local_taxi_rounded)),
-      ],
-    );
-  }
-}
-
-class DriverStatBox extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const DriverStatBox({
-    required this.label,
-    required this.value,
-    required this.icon,
-    super.key,
-  });
+class DriverActionHeader extends StatelessWidget {
+  const DriverActionHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 46,
-      radius: 16,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: kGreenSoft, size: 22),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              color: kGreenSoft,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
+      radius: 20,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: kGreen.withOpacity(.10),
+                border: Border.all(color: kGreenSoft.withOpacity(.30)),
+              ),
+              child: const Icon(Icons.local_taxi_rounded, color: kGreenSoft, size: 22),
             ),
-          ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'עבודת נהג',
+                    style: TextStyle(
+                      fontSize: 22,
+                      height: 1.05,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -.2,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'זמינות, קריאות קרובות, הכנסה ואמון במקום אחד.',
+                    style: TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            DriverOnlinePill(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DriverOnlinePill extends StatelessWidget {
+  const DriverOnlinePill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: kGreen.withOpacity(.12),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: kGreenSoft.withOpacity(.35)),
+      ),
+      alignment: Alignment.center,
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.sensors_rounded, color: kGreenSoft, size: 14),
+          SizedBox(width: 5),
           Text(
-            label,
-            style: const TextStyle(
-              color: const Color(0xFF8793A0),
-              fontSize: 11,
+            'על הקו',
+            style: TextStyle(
+              color: kGreenSoft,
+              fontSize: 12,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1707,43 +1695,283 @@ class DriverStatBox extends StatelessWidget {
   }
 }
 
-class DriverLiveCallCard extends StatelessWidget {
-  final String title;
-  final String route;
-  final String eta;
-  final String price;
+class DriverWorkPanel extends StatelessWidget {
+  const DriverWorkPanel({super.key});
 
-  const DriverLiveCallCard({
-    required this.title,
-    required this.route,
-    required this.eta,
-    required this.price,
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 22,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: const [
+            DriverLiveStatusCard(),
+            SizedBox(height: 12),
+            SizedBox(
+              height: 218,
+              child: LiveMapCanvas(),
+            ),
+            SizedBox(height: 12),
+            DriverWorkStats(),
+            SizedBox(height: 12),
+            DriverPrimaryCall(),
+            SizedBox(height: 10),
+            DriverQueueRow(
+              title: 'קריאה משתלמת',
+              meta: 'רמת גן → ירושלים · 9 דק׳',
+              value: '₪240',
+              accent: kGold,
+            ),
+            SizedBox(height: 8),
+            DriverQueueRow(
+              title: 'קריאה קרובה',
+              meta: 'בני ברק → פתח תקווה · 4 דק׳',
+              value: '₪68',
+              accent: kGreenSoft,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DriverLiveStatusCard extends StatelessWidget {
+  const DriverLiveStatusCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 54,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF17C985),
+            Color(0xFF73E6B4),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(color: kGreen.withOpacity(.16), blurRadius: 20, offset: Offset(0, 7)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0xFF03120B).withOpacity(.90),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: const Icon(Icons.sensors_rounded, color: Colors.white, size: 18),
+          ),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'זמין לקבלת קריאות',
+              style: TextStyle(
+                color: Color(0xFF03120B),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const Text(
+            'LIVE',
+            style: TextStyle(
+              color: Color(0xFF03120B),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: .8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverWorkStats extends StatelessWidget {
+  const DriverWorkStats({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(
+          child: DriverWorkMetric(
+            icon: Icons.payments_rounded,
+            label: 'היום',
+            value: '₪740',
+            accent: kGreenSoft,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: DriverWorkMetric(
+            icon: Icons.verified_user_rounded,
+            label: 'אמון',
+            value: '98%',
+            accent: kGold,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: DriverWorkMetric(
+            icon: Icons.local_taxi_rounded,
+            label: 'קריאות',
+            value: '12',
+            accent: kGreenSoft,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DriverWorkMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accent;
+
+  const DriverWorkMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 72,
-      radius: 16,
+      height: 62,
+      radius: 14,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: accent, size: 17),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF8793A0),
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverPrimaryCall extends StatelessWidget {
+  const DriverPrimaryCall({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 18,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         child: Row(
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: kGreen.withOpacity(.14),
-                border: Border.all(color: kGreenSoft.withOpacity(.55)),
-                boxShadow: [
-                  BoxShadow(color: kGreen.withOpacity(.10), blurRadius: 24),
-                ],
+                color: kGold.withOpacity(.10),
+                border: Border.all(color: kGold.withOpacity(.42)),
               ),
-              child: const Icon(Icons.local_taxi_rounded, color: kGreen),
+              child: const Icon(Icons.local_fire_department_rounded, color: kGold, size: 21),
             ),
             const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'קריאה מומלצת',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'רמת גן → ירושלים · 9 דק׳ ממך',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              '₪240',
+              style: TextStyle(
+                color: kGold,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 74,
+              child: NeonButton(label: 'קבל', compact: true),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DriverQueueRow extends StatelessWidget {
+  final String title;
+  final String meta;
+  final String value;
+  final Color accent;
+
+  const DriverQueueRow({
+    required this.title,
+    required this.meta,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 50,
+      radius: 15,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Icon(Icons.radio_button_checked_rounded, color: accent, size: 16),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1751,51 +1979,31 @@ class DriverLiveCallCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 2),
                   Text(
-                    '$route · $eta',
+                    meta,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: const Color(0xFF8793A0),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF8793A0),
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
             Text(
-              price,
-              style: const TextStyle(
-                color: kGold,
-                fontSize: 14,
+              value,
+              style: TextStyle(
+                color: accent,
+                fontSize: 13,
                 fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              height: 42,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                color: kGreen,
-                boxShadow: [
-                  BoxShadow(color: kGreen.withOpacity(.25), blurRadius: 24),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'קבל',
-                style: TextStyle(
-                  color: Color(0xFF03120B),
-                  fontWeight: FontWeight.w900,
-                ),
               ),
             ),
           ],
