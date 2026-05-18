@@ -43,7 +43,7 @@ class _AppHomeState extends State<AppHome> {
   final tabs = const [
     AppTab('ניהול', Icons.dashboard_rounded),
     AppTab('נהג', Icons.local_taxi_rounded),
-    AppTab('הצעות', Icons.how_to_vote_rounded),
+    AppTab('מרחב', Icons.hub_rounded),
     AppTab('לקוח', Icons.person_rounded),
     AppTab('אמון', Icons.verified_user_rounded),
   ];
@@ -109,12 +109,12 @@ class AppStage extends StatelessWidget {
       return const CustomerBookingScene();
     }
 
-    if (selected == 1) {
-      return const DriverLiveScene();
+    if (selected == 0) {
+      return const AdminCommandScene();
     }
 
-    if (selected == 2) {
-      return const DriverOffersScene();
+    if (selected == 1) {
+      return const DriverLiveScene();
     }
 
     final title = switch (selected) {
@@ -180,6 +180,323 @@ enum PhoneMode { home, customer, driver, admin, trust }
 
 
 
+
+
+class AdminCommandScene extends StatelessWidget {
+  const AdminCommandScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 960),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 30,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('Command Center'),
+                const SizedBox(height: 18),
+                Text(
+                  'לוח בקרה',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 52 : 78,
+                    height: .9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GlassPanel(
+                  radius: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: const [
+                        AdminMetricsGrid(),
+                        SizedBox(height: 16),
+                        SizedBox(
+                          height: 260,
+                          child: AdminActivityChart(),
+                        ),
+                        SizedBox(height: 16),
+                        AdminActivityPanel(),
+                        SizedBox(height: 16),
+                        AdminApprovalsPanel(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AdminMetricsGrid extends StatelessWidget {
+  const AdminMetricsGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        Row(
+          children: [
+            Expanded(child: AdminMetricTile(label: 'קריאות', value: '248', icon: Icons.radio_button_checked_rounded, accent: kGreenSoft)),
+            SizedBox(width: 10),
+            Expanded(child: AdminMetricTile(label: 'נהגים', value: '1,458', icon: Icons.local_taxi_rounded, accent: kGreenSoft)),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(child: AdminMetricTile(label: 'דיווחים', value: '23', icon: Icons.report_rounded, accent: kGold)),
+            SizedBox(width: 10),
+            Expanded(child: AdminMetricTile(label: 'אמון', value: '98%', icon: Icons.verified_user_rounded, accent: kGreenSoft)),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class AdminMetricTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color accent;
+
+  const AdminMetricTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 112,
+      radius: 26,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: accent, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              height: .9,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white60,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AdminActivityChart extends StatelessWidget {
+  const AdminActivityChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: CustomPaint(
+        painter: AdminChartPainter(),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class AdminChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bg = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF04101B), Color(0xFF071D24), Color(0xFF020711)],
+      ).createShader(Offset.zero & size);
+
+    canvas.drawRect(Offset.zero & size, bg);
+
+    final grid = Paint()
+      ..color = Colors.white.withOpacity(.055)
+      ..strokeWidth = 1;
+
+    for (double x = 0; x < size.width; x += 42) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
+    }
+
+    for (double y = 0; y < size.height; y += 42) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+    }
+
+    final bars = [.32, .55, .40, .78, .62, .86, .58, .92, .70];
+    final barWidth = size.width / (bars.length * 1.8);
+    final gap = barWidth * .8;
+
+    for (var i = 0; i < bars.length; i++) {
+      final h = size.height * bars[i] * .72;
+      final x = 26 + i * (barWidth + gap);
+      final y = size.height - h - 28;
+
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, y, barWidth, h),
+        const Radius.circular(12),
+      );
+
+      canvas.drawRRect(
+        rect,
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [kGreenSoft, kGreen],
+          ).createShader(rect.outerRect),
+      );
+
+      canvas.drawRRect(
+        rect,
+        Paint()
+          ..color = kGreen.withOpacity(.22)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+      );
+    }
+
+    _label(canvas, 'פעילות היום', Offset(size.width - 24, 28), kGreenSoft, alignRight: true);
+    _label(canvas, 'Live', Offset(28, 28), kGold);
+  }
+
+  void _label(Canvas canvas, String text, Offset offset, Color color, {bool alignRight = false}) {
+    final painter = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: color,
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    )..layout();
+
+    painter.paint(
+      canvas,
+      Offset(
+        alignRight ? offset.dx - painter.width : offset.dx,
+        offset.dy,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class AdminActivityPanel extends StatelessWidget {
+  const AdminActivityPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        AdminRow(icon: Icons.radio_button_checked_rounded, title: 'קריאה פעילה', value: 'בני ברק → פתח תקווה', accent: kGreenSoft),
+        SizedBox(height: 10),
+        AdminRow(icon: Icons.local_fire_department_rounded, title: 'אזור חם', value: 'גוש דן', accent: kGold),
+      ],
+    );
+  }
+}
+
+class AdminApprovalsPanel extends StatelessWidget {
+  const AdminApprovalsPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        AdminRow(icon: Icons.person_add_alt_1_rounded, title: 'נהג לאישור', value: 'רפי כהן', accent: kGreenSoft),
+        SizedBox(height: 10),
+        AdminRow(icon: Icons.report_rounded, title: 'דיווח לבדיקה', value: 'נסיעה חריגה', accent: kGold),
+      ],
+    );
+  }
+}
+
+class AdminRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color accent;
+
+  const AdminRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 76,
+      radius: 24,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Icon(icon, color: accent, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: TextStyle(
+                color: accent,
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class DriverZoneScene extends StatelessWidget {
   const DriverZoneScene({super.key});
