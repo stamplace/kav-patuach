@@ -62,7 +62,7 @@ class _AppHomeState extends State<AppHome> {
             CityBackdrop(mode: visualMode),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
                 child: Column(
                   children: [
                     TopBar(
@@ -72,7 +72,7 @@ class _AppHomeState extends State<AppHome> {
                         () => visualMode = visualMode == VisualMode.night ? VisualMode.day : VisualMode.night,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 12),
                     Expanded(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 280),
@@ -167,7 +167,7 @@ class AppStage extends StatelessWidget {
             ? Column(
                 children: [
                   BrandBlock(title: title, subtitle: subtitle, centered: true),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   PremiumPhone(mode: phoneMode),
                 ],
               )
@@ -213,28 +213,28 @@ class AdminCommandScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('Command Center'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'לוח בקרה',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 52 : 78,
-                    height: .9,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 36,
+                  radius: 22,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: const [
                         AdminMetricsGrid(),
                         SizedBox(height: 16),
                         SizedBox(
-                          height: 260,
+                          height: 200,
                           child: AdminActivityChart(),
                         ),
                         SizedBox(height: 16),
@@ -298,8 +298,8 @@ class AdminMetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 112,
-      radius: 26,
+      height: 72,
+      radius: 16,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -311,7 +311,7 @@ class AdminMetricTile extends StatelessWidget {
               color: accent,
               fontSize: 28,
               fontWeight: FontWeight.w900,
-              height: .9,
+              height: 1.08,
             ),
           ),
           const SizedBox(height: 6),
@@ -411,7 +411,7 @@ class AdminChartPainter extends CustomPainter {
         text: text,
         style: TextStyle(
           color: color,
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: FontWeight.w900,
         ),
       ),
@@ -477,8 +477,8 @@ class AdminRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 76,
-      radius: 24,
+      height: 46,
+      radius: 16,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
@@ -488,7 +488,7 @@ class AdminRow extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -497,7 +497,7 @@ class AdminRow extends StatelessWidget {
               value,
               style: TextStyle(
                 color: accent,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -529,29 +529,29 @@ class DriverZoneScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('מרחב נהגים'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'אזור חי',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 54 : 78,
-                    height: .9,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 36,
+                  radius: 22,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: [
                         SizedBox(
-                          height: compact ? 390 : 470,
+                          height: compact ? 300 : 380,
                           child: const ZoneMapCanvas(),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
                         const ZoneStatsStrip(),
                         const SizedBox(height: 16),
                         const ZoneEventRow(
@@ -748,8 +748,8 @@ class ZoneStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 90,
-      radius: 24,
+      height: 46,
+      radius: 16,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -759,7 +759,7 @@ class ZoneStat extends StatelessWidget {
             value,
             style: const TextStyle(
               color: kGreenSoft,
-              fontSize: 23,
+              fontSize: 19,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -794,8 +794,8 @@ class ZoneEventRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 74,
-      radius: 24,
+      height: 46,
+      radius: 16,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
@@ -805,7 +805,7 @@ class ZoneEventRow extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -814,7 +814,7 @@ class ZoneEventRow extends StatelessWidget {
               value,
               style: TextStyle(
                 color: accent,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -846,22 +846,22 @@ class TrustReferenceScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('בטוח ומאומת'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'שכבת האמון',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 50 : 74,
-                    height: .92,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 36,
+                  radius: 22,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: const [
                         TrustSealLarge(),
@@ -890,8 +890,8 @@ class TrustSealLarge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 142,
-      height: 142,
+      width: 108,
+      height: 108,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: kGold.withOpacity(.08),
@@ -901,7 +901,7 @@ class TrustSealLarge extends StatelessWidget {
           BoxShadow(color: kGreen.withOpacity(.16), blurRadius: 90),
         ],
       ),
-      child: const Icon(Icons.verified_user_rounded, color: kGold, size: 72),
+      child: const Icon(Icons.verified_user_rounded, color: kGold, size: 52),
     );
   }
 }
@@ -912,8 +912,8 @@ class TrustScorePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 126,
-      radius: 30,
+      height: 80,
+      radius: 18,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
@@ -921,7 +921,7 @@ class TrustScorePanel extends StatelessWidget {
             'מדד אמון',
             style: TextStyle(
               color: Colors.white70,
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -930,8 +930,8 @@ class TrustScorePanel extends StatelessWidget {
             '98%',
             style: TextStyle(
               color: kGreenSoft,
-              fontSize: 58,
-              height: .9,
+              fontSize: 42,
+              height: 1.08,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1013,8 +1013,8 @@ class TrustCapabilityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 124,
-      radius: 26,
+      height: 80,
+      radius: 16,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -1033,7 +1033,7 @@ class TrustCapabilityCard extends StatelessWidget {
             value,
             style: TextStyle(
               color: accent,
-              fontSize: 22,
+              fontSize: 14,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1049,7 +1049,7 @@ class TrustBottomPromise extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 62,
+      height: 48,
       radius: 31,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1090,22 +1090,22 @@ class DriverOffersScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('הקריאה שלך פתוחה'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   '3 נהגים הגיבו',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 48 : 72,
-                    height: .92,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 36,
+                  radius: 22,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: const [
                         OfferStatusHeart(),
@@ -1165,7 +1165,7 @@ class OfferStatusHeart extends StatelessWidget {
       children: [
         Container(
           width: 86,
-          height: 86,
+          height: 72,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: kGreen.withOpacity(.10),
@@ -1213,8 +1213,8 @@ class DriverOfferReferenceCard extends StatelessWidget {
     final icon = tone == OfferTone.gold ? Icons.workspace_premium_rounded : Icons.verified_rounded;
 
     return GlassPanel(
-      height: 112,
-      radius: 28,
+      height: 72,
+      radius: 18,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
@@ -1230,7 +1230,7 @@ class DriverOfferReferenceCard extends StatelessWidget {
                     '$name · $eta · אמון $trust',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -1266,7 +1266,7 @@ class DriverOfferReferenceCard extends StatelessWidget {
                 color: accent,
                 fontSize: 42,
                 fontWeight: FontWeight.w900,
-                height: .9,
+                height: 1.08,
               ),
             ),
             const SizedBox(width: 3),
@@ -1296,7 +1296,7 @@ class DriverAvatar extends StatelessWidget {
       children: [
         Container(
           width: 58,
-          height: 58,
+          height: 46,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: const Color(0xFF101B28),
@@ -1347,31 +1347,31 @@ class DriverLiveScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('נהג'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'אני על הקו',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 54 : 78,
-                    height: .9,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 36,
+                  radius: 22,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: [
                         const NeonSwitch(),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
                         SizedBox(
-                          height: compact ? 280 : 390,
+                          height: compact ? 250 : 330,
                           child: const LiveMapCanvas(),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
                         const DriverLiveStatsStrip(),
                         const SizedBox(height: 16),
                         const DriverLiveCallCard(
@@ -1432,8 +1432,8 @@ class DriverStatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 92,
-      radius: 24,
+      height: 46,
+      radius: 16,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -1443,7 +1443,7 @@ class DriverStatBox extends StatelessWidget {
             value,
             style: const TextStyle(
               color: kGreenSoft,
-              fontSize: 22,
+              fontSize: 14,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1478,8 +1478,8 @@ class DriverLiveCallCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 86,
-      radius: 24,
+      height: 72,
+      radius: 16,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
@@ -1506,7 +1506,7 @@ class DriverLiveCallCard extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -1516,7 +1516,7 @@ class DriverLiveCallCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white60,
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -1528,7 +1528,7 @@ class DriverLiveCallCard extends StatelessWidget {
               price,
               style: const TextStyle(
                 color: kGold,
-                fontSize: 22,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -1580,22 +1580,22 @@ class CustomerBookingScene extends StatelessWidget {
             child: Column(
               children: [
                 const GlassLabel('לקוח'),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'לאן נוסעים?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: compact ? 54 : 76,
-                    height: .9,
+                    fontSize: compact ? 32 : 42,
+                    height: 1.08,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
+                    letterSpacing: -.6,
                   ),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 14),
                 GlassPanel(
-                  radius: 34,
+                  radius: 20,
                   child: Padding(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    padding: EdgeInsets.all(compact ? 14 : 18),
                     child: Column(
                       children: [
                         const AppInput(label: 'מאיפה אוספים אותך?'),
@@ -1605,16 +1605,16 @@ class CustomerBookingScene extends StatelessWidget {
                         const SegmentRow(),
                         const SizedBox(height: 16),
                         SizedBox(
-                          height: compact ? 230 : 330,
+                          height: compact ? 220 : 300,
                           child: const LiveMapCanvas(),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
                         const NeonButton(label: 'פתח קריאה'),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 const TrustStrip(),
               ],
             ),
@@ -1631,8 +1631,8 @@ class TrustStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 58,
-      radius: 29,
+      height: 46,
+      radius: 18,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
@@ -1888,10 +1888,10 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 72,
-      radius: 38,
+      height: 46,
+      radius: 24,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: [
             const BrandSmall(),
@@ -1922,10 +1922,10 @@ class ModeToggleChip extends StatelessWidget {
     final isDay = mode == VisualMode.day;
 
     return Container(
-      height: 48,
-      width: 54,
+      height: 38,
+      width: 42,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(14),
         color: Colors.black.withOpacity(.24),
         border: Border.all(
           color: (isDay ? kGold : kGreenSoft).withOpacity(.55),
@@ -1959,7 +1959,7 @@ class BrandSmall extends StatelessWidget {
           TextSpan(text: 'פתוח', style: TextStyle(color: kGreen)),
         ],
       ),
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
     );
   }
 }
@@ -1982,7 +1982,7 @@ class BrandBlock extends StatelessWidget {
       crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         const GlassLabel('Live Network'),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
         Text.rich(
           TextSpan(
             children: [
@@ -2000,12 +2000,12 @@ class BrandBlock extends StatelessWidget {
           textAlign: centered ? TextAlign.center : TextAlign.right,
           style: const TextStyle(
             fontSize: 72,
-            height: .9,
+            height: 1.08,
             fontWeight: FontWeight.w900,
             letterSpacing: -3,
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
         Text(
           subtitle,
           textAlign: centered ? TextAlign.center : TextAlign.right,
@@ -2067,7 +2067,7 @@ class PremiumPhone extends StatelessWidget {
                     height: 28,
                     decoration: BoxDecoration(
                       color: Colors.black,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
@@ -2077,7 +2077,7 @@ class PremiumPhone extends StatelessWidget {
                 child: Column(
                   children: [
                     const PhoneHeader(),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 12),
                     Expanded(child: PhoneContent(mode: mode)),
                   ],
                 ),
@@ -2206,7 +2206,7 @@ class TrustPhone extends StatelessWidget {
       children: const [
         Text(
           'שכבת האמון שלנו',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
         ),
         SizedBox(height: 18),
         TrustSeal(),
@@ -2246,7 +2246,7 @@ class NeonSwitch extends StatelessWidget {
           const Center(
             child: Text(
               'אני על הקו',
-              style: TextStyle(color: Color(0xFF03120B), fontSize: 24, fontWeight: FontWeight.w900),
+              style: TextStyle(color: Color(0xFF03120B), fontSize: 14, fontWeight: FontWeight.w900),
             ),
           ),
         ],
@@ -2483,7 +2483,7 @@ class CallRow extends StatelessWidget {
           children: [
             const Icon(Icons.local_taxi_rounded, color: kGreen, size: 22),
             const SizedBox(width: 9),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             const Spacer(),
             Text(meta, style: const TextStyle(color: kGreenSoft, fontWeight: FontWeight.w900)),
           ],
@@ -2501,15 +2501,15 @@ class AppInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 76,
+      height: 46,
       radius: 22,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: [
             const Icon(Icons.location_on_rounded, color: kGreen),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
+            Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           ],
         ),
       ),
@@ -2541,7 +2541,7 @@ class SegmentButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 62,
+      height: 48,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: active ? kGreen.withOpacity(.18) : Colors.black.withOpacity(.28),
@@ -2552,8 +2552,8 @@ class SegmentButton extends StatelessWidget {
         label,
         style: TextStyle(
           color: active ? Colors.white : Colors.white60,
-          fontSize: 18,
-          fontWeight: FontWeight.w900,
+          fontSize: 14,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -2584,13 +2584,13 @@ class MiniMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 96,
-      radius: 24,
+      height: 80,
+      radius: 16,
       child: Center(
         child: Text(
           '$label\n$value',
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kGreenSoft),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kGreenSoft),
         ),
       ),
     );
@@ -2637,12 +2637,12 @@ class TrustScore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 110,
-      radius: 28,
+      height: 72,
+      radius: 18,
       child: const Center(
         child: Text(
           '98% אמון',
-          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: kGreenSoft),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: kGreenSoft),
         ),
       ),
     );
@@ -2655,13 +2655,13 @@ class TrustMiniCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const GlassPanel(
-      height: 88,
-      radius: 24,
+      height: 72,
+      radius: 16,
       child: Center(
         child: Text(
           'אמון\n97%',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kGold),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kGold),
         ),
       ),
     );
@@ -2674,13 +2674,13 @@ class IncomeMiniCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const GlassPanel(
-      height: 88,
-      radius: 24,
+      height: 72,
+      radius: 16,
       child: Center(
         child: Text(
           'הכנסה\n₪1,280',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: kGreenSoft),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: kGreenSoft),
         ),
       ),
     );
@@ -2695,7 +2695,7 @@ class GlassPanel extends StatelessWidget {
   const GlassPanel({
     required this.child,
     this.height,
-    this.radius = 28,
+    this.radius = 18,
     super.key,
   });
 
@@ -2708,15 +2708,15 @@ class GlassPanel extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            kPanel.withOpacity(.90),
-            const Color(0xFF020A14).withOpacity(.82),
+            kPanel.withOpacity(.82),
+            const Color(0xFF030912).withOpacity(.76),
           ],
         ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.16)),
+        border: Border.all(color: Colors.white.withOpacity(.10), width: 1),
         boxShadow: [
-          const BoxShadow(color: Colors.black87, blurRadius: 34, offset: Offset(0, 18)),
-          BoxShadow(color: kGreen.withOpacity(.08), blurRadius: 44, spreadRadius: 1),
+          const BoxShadow(color: Colors.black54, blurRadius: 18, offset: Offset(0, 10)),
+          BoxShadow(color: kGreen.withOpacity(.045), blurRadius: 28),
         ],
       ),
       child: child,
@@ -2737,10 +2737,10 @@ class NeonButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: compact ? 48 : 64,
-      padding: EdgeInsets.symmetric(horizontal: compact ? 22 : 32),
+      height: compact ? 38 : 50,
+      padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(colors: [Color(0xFF08C985), Color(0xFF22F08E)]),
         boxShadow: [BoxShadow(color: kGreen.withOpacity(.35), blurRadius: 34)],
       ),
@@ -2749,7 +2749,7 @@ class NeonButton extends StatelessWidget {
         label,
         style: TextStyle(
           color: const Color(0xFF03120B),
-          fontSize: compact ? 18 : 24,
+          fontSize: compact ? 14 : 17,
           fontWeight: FontWeight.w900,
         ),
       ),
@@ -2768,7 +2768,7 @@ class GlassLabel extends StatelessWidget {
       height: 42,
       radius: 22,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Center(
           child: Text(
             label,
@@ -2789,9 +2789,9 @@ class MiniPromise extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassPanel(
       height: 48,
-      radius: 24,
+      radius: 16,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Center(
           child: Text(
             label,
@@ -2818,7 +2818,7 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 72,
+      height: 46,
       radius: 32,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2829,10 +2829,10 @@ class BottomNav extends StatelessWidget {
               onTap: () => onSelect(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
                 decoration: BoxDecoration(
                   color: active ? kGreen : Colors.transparent,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -2840,7 +2840,7 @@ class BottomNav extends StatelessWidget {
                     Icon(
                       tabs[index].icon,
                       color: active ? const Color(0xFF03120B) : Colors.white70,
-                      size: 20,
+                      size: 18,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -2848,7 +2848,7 @@ class BottomNav extends StatelessWidget {
                       style: TextStyle(
                         color: active ? const Color(0xFF03120B) : Colors.white70,
                         fontWeight: FontWeight.w900,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                   ],
