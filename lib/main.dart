@@ -14,13 +14,34 @@ enum VisualMode { night, day }
 // OVERLAY_TUNING_PASS_01: premium image assets are the visual base; UI must stay thin and readable.
 
 
+
+class VisualModeScope extends InheritedWidget {
+  final VisualMode mode;
+
+  const VisualModeScope({
+    required this.mode,
+    required super.child,
+    super.key,
+  });
+
+  static VisualMode maybeOf(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<VisualModeScope>();
+    return scope?.mode ?? VisualMode.night;
+  }
+
+  @override
+  bool updateShouldNotify(VisualModeScope oldWidget) => oldWidget.mode != mode;
+}
+
 class PremiumAssetBackground extends StatelessWidget {
   final VisualMode mode;
+  final int scene;
   final Widget fallback;
 
   const PremiumAssetBackground({
     required this.mode,
     required this.fallback,
+    this.scene = 3,
     super.key,
   });
 
@@ -28,54 +49,74 @@ class PremiumAssetBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDay = mode == VisualMode.day;
 
+    final asset = isDay
+        ? 'assets/brand/kav-day-city.webp'
+        : scene == 4
+            ? 'assets/brand/kav-hero-poster-night.webp'
+            : 'assets/brand/kav-night-city.webp';
+
     return Stack(
       children: [
         Positioned.fill(child: fallback),
+
+        // Real premium image asset.
         Positioned.fill(
-          child: Image.asset(
-            'assets/brand/kav-night-city.webp',
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          child: Transform.scale(
+            scale: isDay ? 1.04 : 1.07,
+            child: Image.asset(
+              asset,
+              fit: BoxFit.cover,
+              alignment: isDay ? Alignment.center : const Alignment(0, -0.07),
+              filterQuality: FilterQuality.high,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
           ),
         ),
+
+        // Premium glow: now controlled, not flooding the whole UI.
         Positioned.fill(
           child: Image.asset(
             'assets/brand/kav-premium-glow.webp',
             fit: BoxFit.cover,
-            opacity: AlwaysStoppedAnimation(isDay ? .18 : .36),
+            alignment: Alignment.center,
+            opacity: AlwaysStoppedAnimation(isDay ? .055 : .16),
+            filterQuality: FilterQuality.high,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
         ),
+
+        // Readability veil, intentionally light.
         Positioned.fill(
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: isDay
                     ? [
-                        Colors.white.withOpacity(.34),
-                        const Color(0xFFEAF4F0).withOpacity(.18),
-                        const Color(0xFF06111D).withOpacity(.56),
+                        Colors.white.withOpacity(.10),
+                        Colors.transparent,
+                        const Color(0xFF020711).withOpacity(.30),
                       ]
                     : [
-                        const Color(0xFF020611).withOpacity(.34),
+                        const Color(0xFF020611).withOpacity(.10),
                         Colors.transparent,
-                        Colors.black.withOpacity(.76),
+                        Colors.black.withOpacity(.48),
                       ],
               ),
             ),
           ),
         ),
+
+        // Bottom vignette for nav readability.
         Positioned.fill(
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: const Alignment(.15, -.35),
-                radius: 1.05,
+                center: const Alignment(0, .85),
+                radius: .95,
                 colors: [
-                  kGreen.withOpacity(isDay ? .10 : .18),
+                  Colors.black.withOpacity(isDay ? .22 : .46),
                   Colors.transparent,
                 ],
               ),
@@ -87,6 +128,8 @@ class PremiumAssetBackground extends StatelessWidget {
   }
 }
 
+
+
 class PremiumMapSurface extends StatelessWidget {
   final Widget child;
 
@@ -97,37 +140,51 @@ class PremiumMapSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mode = VisualModeScope.maybeOf(context);
+    final isDay = mode == VisualMode.day;
+    final asset = isDay
+        ? 'assets/brand/kav-map-light.webp'
+        : 'assets/brand/kav-map-dark.webp';
+
     return Stack(
       children: [
         Positioned.fill(
           child: Image.asset(
-            'assets/brand/kav-map-dark.webp',
+            asset,
             fit: BoxFit.cover,
             alignment: Alignment.center,
+            filterQuality: FilterQuality.high,
             errorBuilder: (_, __, ___) => Container(color: const Color(0xFF03101A)),
           ),
         ),
+
+        // Very light contrast layer only. The image is the map now.
         Positioned.fill(
           child: Container(
+            color: isDay
+                ? Colors.white.withOpacity(.035)
+                : const Color(0xFF020711).withOpacity(.10),
+          ),
+        ),
+
+        Positioned.fill(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: const Alignment(.25, -.15),
-                radius: 1.0,
+                center: const Alignment(.26, -.20),
+                radius: .95,
                 colors: [
-                  kGreen.withOpacity(.18),
+                  kGreen.withOpacity(isDay ? .035 : .070),
                   Colors.transparent,
                 ],
               ),
             ),
           ),
         ),
-        Positioned.fill(
-          child: Container(
-            color: const Color(0xFF020711).withOpacity(.18),
-          ),
-        ),
+
+        // Old code-drawn map layer is now only signal/UI hints, not the map itself.
         Opacity(
-          opacity: .42,
+          opacity: .16,
           child: child,
         ),
       ],
@@ -190,9 +247,11 @@ class _AppHomeState extends State<AppHome> {
       child: Scaffold(
         body: Stack(
           children: [
-            PremiumAssetBackground(mode: visualMode, fallback: CityBackdrop(mode: visualMode)),
-            SafeArea(
-              child: Padding(
+            PremiumAssetBackground(mode: visualMode, scene: selected, fallback: CityBackdrop(mode: visualMode)),
+            VisualModeScope(
+              mode: visualMode,
+              child: SafeArea(
+                child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
                 child: Column(
                   children: [
@@ -222,6 +281,7 @@ class _AppHomeState extends State<AppHome> {
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ),
@@ -488,7 +548,7 @@ class AdminChartPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, bg);
 
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.055)
+      ..color = Colors.white.withOpacity(.022)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 42) {
@@ -526,7 +586,7 @@ class AdminChartPainter extends CustomPainter {
       canvas.drawRRect(
         rect,
         Paint()
-          ..color = kGreen.withOpacity(.22)
+          ..color = kGreen.withOpacity(.11)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
       );
     }
@@ -718,9 +778,11 @@ class ZoneMapCanvas extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
-      child: CustomPaint(
-        painter: ZoneMapPainter(),
-        child: const SizedBox.expand(),
+      child: PremiumMapSurface(
+        child: CustomPaint(
+          painter: ZoneMapPainter(),
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
@@ -739,7 +801,7 @@ class ZoneMapPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, bg);
 
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.065)
+      ..color = Colors.white.withOpacity(.025)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 36) {
@@ -766,14 +828,14 @@ class ZoneMapPainter extends CustomPainter {
     canvas.drawPath(
       zonePath,
       Paint()
-        ..color = kGreenSoft.withOpacity(.58)
+        ..color = kGreenSoft.withOpacity(.32)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
     );
 
     final route = Paint()
-      ..color = kGreen.withOpacity(.50)
+      ..color = kGreen.withOpacity(.28)
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
 
@@ -802,7 +864,7 @@ class ZoneMapPainter extends CustomPainter {
   void _driver(Canvas canvas, Size size, Offset unit, String label) {
     final pos = Offset(size.width * unit.dx, size.height * unit.dy);
     final glow = Paint()
-      ..color = kGreen.withOpacity(.20)
+      ..color = kGreen.withOpacity(.10)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
 
     canvas.drawCircle(pos, 30, glow);
@@ -2425,7 +2487,7 @@ class LiveMapPainter extends CustomPainter {
 
   void _drawMapTexture(Canvas canvas, Size size) {
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.055)
+      ..color = Colors.white.withOpacity(.022)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 34) {
@@ -2507,7 +2569,7 @@ class LiveMapPainter extends CustomPainter {
     canvas.drawPath(
       route,
       Paint()
-        ..color = kGreen.withOpacity(.22)
+        ..color = kGreen.withOpacity(.11)
         ..strokeWidth = 16
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke
@@ -2569,7 +2631,7 @@ class LiveMapPainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(18)),
       Paint()
-        ..color = kGreen.withOpacity(.20)
+        ..color = kGreen.withOpacity(.10)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
@@ -3778,7 +3840,7 @@ class StudioLiveSwitch extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(color: kGreen.withOpacity(.22), blurRadius: 24, offset: const Offset(0, 8)),
+          BoxShadow(color: kGreen.withOpacity(.11), blurRadius: 24, offset: const Offset(0, 8)),
         ],
       ),
       child: Row(
@@ -4031,7 +4093,7 @@ class StudioMapPainter extends CustomPainter {
 
   void _roads(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(.055)
+      ..color = Colors.white.withOpacity(.022)
       ..strokeWidth = .8;
 
     for (double x = 0; x < size.width; x += 34) {
