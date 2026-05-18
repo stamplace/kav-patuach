@@ -11,6 +11,129 @@ const kGold = Color(0xFFF6C66D);
 
 enum VisualMode { night, day }
 
+
+class PremiumAssetBackground extends StatelessWidget {
+  final VisualMode mode;
+  final Widget fallback;
+
+  const PremiumAssetBackground({
+    required this.mode,
+    required this.fallback,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDay = mode == VisualMode.day;
+
+    return Stack(
+      children: [
+        Positioned.fill(child: fallback),
+        Positioned.fill(
+          child: Image.asset(
+            'assets/brand/kav-night-city.webp',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        ),
+        Positioned.fill(
+          child: Image.asset(
+            'assets/brand/kav-premium-glow.webp',
+            fit: BoxFit.cover,
+            opacity: AlwaysStoppedAnimation(isDay ? .18 : .36),
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDay
+                    ? [
+                        Colors.white.withOpacity(.34),
+                        const Color(0xFFEAF4F0).withOpacity(.18),
+                        const Color(0xFF06111D).withOpacity(.56),
+                      ]
+                    : [
+                        const Color(0xFF020611).withOpacity(.34),
+                        Colors.transparent,
+                        Colors.black.withOpacity(.76),
+                      ],
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(.15, -.35),
+                radius: 1.05,
+                colors: [
+                  kGreen.withOpacity(isDay ? .10 : .18),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PremiumMapSurface extends StatelessWidget {
+  final Widget child;
+
+  const PremiumMapSurface({
+    required this.child,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset(
+            'assets/brand/kav-map-dark.webp',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (_, __, ___) => Container(color: const Color(0xFF03101A)),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(.25, -.15),
+                radius: 1.0,
+                colors: [
+                  kGreen.withOpacity(.18),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            color: const Color(0xFF020711).withOpacity(.18),
+          ),
+        ),
+        Opacity(
+          opacity: .42,
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
+
 void main() {
   runApp(const KavPatuachApp());
 }
@@ -65,7 +188,7 @@ class _AppHomeState extends State<AppHome> {
       child: Scaffold(
         body: Stack(
           children: [
-            CityBackdrop(mode: visualMode),
+            PremiumAssetBackground(mode: visualMode, fallback: CityBackdrop(mode: visualMode)),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
@@ -2268,9 +2391,11 @@ class LiveMapCanvas extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: CustomPaint(
-        painter: LiveMapPainter(),
-        child: const SizedBox.expand(),
+      child: PremiumMapSurface(
+        child: CustomPaint(
+          painter: LiveMapPainter(),
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
@@ -2902,7 +3027,7 @@ class _StudioHomeState extends State<StudioHome> {
       child: Scaffold(
         body: Stack(
           children: [
-            StudioBackdrop(mode: mode),
+            PremiumAssetBackground(mode: mode, fallback: StudioBackdrop(mode: mode)),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
@@ -3858,9 +3983,11 @@ class StudioRouteMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: CustomPaint(
-        painter: StudioMapPainter(driverMode: driverMode),
-        child: const SizedBox.expand(),
+      child: PremiumMapSurface(
+        child: CustomPaint(
+          painter: StudioMapPainter(driverMode: driverMode),
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
@@ -3988,9 +4115,11 @@ class StudioZoneMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: CustomPaint(
-        painter: StudioZonePainter(),
-        child: const SizedBox.expand(),
+      child: PremiumMapSurface(
+        child: CustomPaint(
+          painter: StudioZonePainter(),
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
