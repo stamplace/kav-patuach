@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const kBg = Color(0xFF02070F);
 const kPanel = Color(0xFF071523);
@@ -25,10 +26,15 @@ class KavPatuachApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        fontFamily: 'Arial',
         scaffoldBackgroundColor: kBg,
+        textTheme: GoogleFonts.heeboTextTheme(
+          ThemeData(brightness: Brightness.dark, useMaterial3: true).textTheme,
+        ).apply(
+          bodyColor: const Color(0xFFF3F7FA),
+          displayColor: const Color(0xFFF3F7FA),
+        ),
       ),
-      home: const StudioHome(),
+      home: const AppHome(),
     );
   }
 }
