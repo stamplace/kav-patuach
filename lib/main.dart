@@ -109,6 +109,10 @@ class AppStage extends StatelessWidget {
       return const CustomerBookingScene();
     }
 
+    if (selected == 1) {
+      return const DriverLiveScene();
+    }
+
     final title = switch (selected) {
       0 => 'לוח בקרה',
       1 => 'אני על הקו',
@@ -160,6 +164,240 @@ class AppStage extends StatelessWidget {
 
 enum PhoneMode { home, customer, driver, admin, trust }
 
+
+
+class DriverLiveScene extends StatelessWidget {
+  const DriverLiveScene({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 620;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: compact ? 8 : 30,
+              bottom: 12,
+            ),
+            child: Column(
+              children: [
+                const GlassLabel('נהג'),
+                const SizedBox(height: 18),
+                Text(
+                  'אני על הקו',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: compact ? 54 : 78,
+                    height: .9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -2,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                GlassPanel(
+                  radius: 36,
+                  child: Padding(
+                    padding: EdgeInsets.all(compact ? 18 : 24),
+                    child: Column(
+                      children: [
+                        const NeonSwitch(),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          height: compact ? 280 : 390,
+                          child: const LiveMapCanvas(),
+                        ),
+                        const SizedBox(height: 18),
+                        const DriverLiveStatsStrip(),
+                        const SizedBox(height: 16),
+                        const DriverLiveCallCard(
+                          title: 'קריאה קרובה',
+                          route: 'בני ברק → פתח תקווה',
+                          eta: '4 דק׳ ממך',
+                          price: '₪68',
+                        ),
+                        const SizedBox(height: 10),
+                        const DriverLiveCallCard(
+                          title: 'קריאה משתלמת',
+                          route: 'רמת גן → ירושלים',
+                          eta: '9 דק׳ ממך',
+                          price: '₪240',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DriverLiveStatsStrip extends StatelessWidget {
+  const DriverLiveStatsStrip({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: DriverStatBox(label: 'הכנסה היום', value: '₪740', icon: Icons.payments_rounded)),
+        SizedBox(width: 10),
+        Expanded(child: DriverStatBox(label: 'אמון הנהג', value: '98%', icon: Icons.verified_user_rounded)),
+        SizedBox(width: 10),
+        Expanded(child: DriverStatBox(label: 'קריאות', value: '12', icon: Icons.local_taxi_rounded)),
+      ],
+    );
+  }
+}
+
+class DriverStatBox extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const DriverStatBox({
+    required this.label,
+    required this.value,
+    required this.icon,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 92,
+      radius: 24,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: kGreenSoft, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: kGreenSoft,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white60,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverLiveCallCard extends StatelessWidget {
+  final String title;
+  final String route;
+  final String eta;
+  final String price;
+
+  const DriverLiveCallCard({
+    required this.title,
+    required this.route,
+    required this.eta,
+    required this.price,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 86,
+      radius: 24,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kGreen.withOpacity(.14),
+                border: Border.all(color: kGreenSoft.withOpacity(.55)),
+                boxShadow: [
+                  BoxShadow(color: kGreen.withOpacity(.18), blurRadius: 24),
+                ],
+              ),
+              child: const Icon(Icons.local_taxi_rounded, color: kGreen),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '$route · $eta',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              price,
+              style: const TextStyle(
+                color: kGold,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              height: 42,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                color: kGreen,
+                boxShadow: [
+                  BoxShadow(color: kGreen.withOpacity(.25), blurRadius: 24),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'קבל',
+                style: TextStyle(
+                  color: Color(0xFF03120B),
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class CustomerBookingScene extends StatelessWidget {
   const CustomerBookingScene({super.key});
