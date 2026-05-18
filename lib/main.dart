@@ -13,6 +13,7 @@ enum VisualMode { night, day }
 
 // OVERLAY_TUNING_PASS_01: premium image assets are the visual base; UI must stay thin and readable.
 // VISUAL_COMPOSITION_PASS_02: assets lead, old painters are reduced, trust poster has priority.
+// TRUST_DAY_NIGHT_FIX_01: trust uses poster at night and day-city in day mode until a dedicated day poster exists.
 
 
 
@@ -50,7 +51,7 @@ class PremiumAssetBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDay = mode == VisualMode.day;
 
-    final asset = scene == 4
+    final asset = scene == 4 && !isDay
         ? 'assets/brand/kav-hero-poster-night.webp'
         : isDay
             ? 'assets/brand/kav-day-city.webp'
