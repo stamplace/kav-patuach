@@ -56,6 +56,7 @@ Image premiumAssetImage(
 // ASSET_PERFORMANCE_PASS_01: preload image assets and use gapless playback to prevent tearing on fast taps.
 // USE_CASE_PASS_01_CUSTOMER: customer tab is a clear ride request workflow.
 // USE_CASE_PASS_02_DRIVER: driver tab is a clear live work console.
+// USE_CASE_PASS_03_ZONE: zone tab is a clear live operations surface.
 
 
 
@@ -753,6 +754,7 @@ class AdminRow extends StatelessWidget {
   }
 }
 
+
 class DriverZoneScene extends StatelessWidget {
   const DriverZoneScene({super.key});
 
@@ -765,60 +767,133 @@ class DriverZoneScene extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 920),
+          constraints: const BoxConstraints(maxWidth: 900),
           child: Padding(
-            padding: EdgeInsets.only(
-              top: compact ? 8 : 30,
-              bottom: 12,
-            ),
+            padding: EdgeInsets.only(top: compact ? 6 : 24, bottom: 10),
             child: Column(
-              children: [
-                const GlassLabel('מרחב נהגים'),
-                const SizedBox(height: 12),
-                Text(
-                  'אזור חי',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: compact ? 32 : 42,
-                    height: 1.08,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.6,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GlassPanel(
-                  radius: 22,
-                  child: Padding(
-                    padding: EdgeInsets.all(compact ? 14 : 18),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: compact ? 300 : 380,
-                          child: const ZoneMapCanvas(),
-                        ),
-                        const SizedBox(height: 12),
-                        const ZoneStatsStrip(),
-                        const SizedBox(height: 16),
-                        const ZoneEventRow(
-                          icon: Icons.local_taxi_rounded,
-                          title: 'קריאה חדשה',
-                          value: 'בני ברק · 4 דק׳',
-                          accent: kGreenSoft,
-                        ),
-                        const SizedBox(height: 10),
-                        const ZoneEventRow(
-                          icon: Icons.groups_rounded,
-                          title: 'נהגים על הקו',
-                          value: '86 פעילים',
-                          accent: kGold,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              children: const [
+                ZoneActionHeader(),
+                SizedBox(height: 12),
+                ZoneOperationsPanel(),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ZoneActionHeader extends StatelessWidget {
+  const ZoneActionHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 20,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: kGold.withOpacity(.10),
+                border: Border.all(color: kGold.withOpacity(.34)),
+              ),
+              child: const Icon(Icons.hub_rounded, color: kGold, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'מרחב חי',
+                    style: TextStyle(fontSize: 22, height: 1.05, fontWeight: FontWeight.w900),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'נהגים, קריאות ואזורים חמים בזמן אמת.',
+                    style: TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ZoneHotPill(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ZoneHotPill extends StatelessWidget {
+  const ZoneHotPill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: kGold.withOpacity(.11),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: kGold.withOpacity(.34)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.local_fire_department_rounded, color: kGold, size: 14),
+          SizedBox(width: 5),
+          Text(
+            'חם',
+            style: TextStyle(color: kGold, fontSize: 12, fontWeight: FontWeight.w900),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ZoneOperationsPanel extends StatelessWidget {
+  const ZoneOperationsPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 22,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: const [
+            SizedBox(height: 244, child: ZoneMapCanvas()),
+            SizedBox(height: 12),
+            ZoneStatsStrip(),
+            SizedBox(height: 12),
+            ZoneNetworkStatus(),
+            SizedBox(height: 10),
+            ZoneEventRow(
+              icon: Icons.radio_button_checked_rounded,
+              title: 'קריאה חדשה',
+              value: 'בני ברק · 4 דק׳',
+              accent: kGreenSoft,
+            ),
+            SizedBox(height: 8),
+            ZoneEventRow(
+              icon: Icons.local_taxi_rounded,
+              title: 'נהגים זמינים',
+              value: '86 פעילים',
+              accent: kGold,
+            ),
+          ],
         ),
       ),
     );
@@ -831,10 +906,10 @@ class ZoneMapCanvas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(18),
       child: PremiumMapSurface(
         child: CustomPaint(
-          painter: ZoneMapPainter(),
+          painter: ZonePulsePainter(),
           child: const SizedBox.expand(),
         ),
       ),
@@ -842,121 +917,63 @@ class ZoneMapCanvas extends StatelessWidget {
   }
 }
 
-class ZoneMapPainter extends CustomPainter {
+class ZonePulsePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final bg = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFF04101B), Color(0xFF08231F), Color(0xFF020711)],
-      ).createShader(Offset.zero & size);
-
-    canvas.drawRect(Offset.zero & size, bg);
-
-    final grid = Paint()
-      ..color = Colors.white.withOpacity(.012)
-      ..strokeWidth = 1;
-
-    for (double x = 0; x < size.width; x += 36) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
-    }
-    for (double y = 0; y < size.height; y += 36) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
-    }
-
-    final zonePath = Path()
-      ..moveTo(size.width * .20, size.height * .28)
-      ..quadraticBezierTo(size.width * .50, size.height * .08, size.width * .78, size.height * .30)
-      ..quadraticBezierTo(size.width * .88, size.height * .58, size.width * .64, size.height * .80)
-      ..quadraticBezierTo(size.width * .34, size.height * .92, size.width * .16, size.height * .62)
-      ..quadraticBezierTo(size.width * .08, size.height * .42, size.width * .20, size.height * .28);
+    final zone = Path()
+      ..moveTo(size.width * .20, size.height * .26)
+      ..quadraticBezierTo(size.width * .55, size.height * .08, size.width * .82, size.height * .34)
+      ..quadraticBezierTo(size.width * .76, size.height * .78, size.width * .30, size.height * .82)
+      ..quadraticBezierTo(size.width * .08, size.height * .56, size.width * .20, size.height * .26);
 
     canvas.drawPath(
-      zonePath,
+      zone,
       Paint()
         ..color = kGreen.withOpacity(.08)
         ..style = PaintingStyle.fill,
     );
 
     canvas.drawPath(
-      zonePath,
+      zone,
       Paint()
-        ..color = kGreenSoft.withOpacity(.18)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
+        ..color = kGreenSoft.withOpacity(.38)
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke,
     );
 
-    final route = Paint()
-      ..color = kGreen.withOpacity(.09)
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round;
-
-    final routePath = Path()
-      ..moveTo(size.width * .18, size.height * .72)
-      ..cubicTo(
-        size.width * .38,
-        size.height * .58,
-        size.width * .45,
-        size.height * .28,
-        size.width * .72,
-        size.height * .34,
-      );
-
-    canvas.drawPath(routePath, route);
-
-    _driver(canvas, size, Offset(.28, .36), 'אבי');
-    _driver(canvas, size, Offset(.66, .30), 'רפי');
-    _driver(canvas, size, Offset(.76, .58), 'משה');
-    _driver(canvas, size, Offset(.36, .74), 'יוסי');
-    _call(canvas, size, Offset(.52, .52));
-    _label(canvas, 'אזור בני ברק', Offset(size.width * .66, size.height * .14), kGreenSoft);
-    _label(canvas, 'קריאה חדשה', Offset(size.width * .56, size.height * .58), kGold);
+    _dot(canvas, size, const Offset(.28, .36), 'אבי', kGreenSoft);
+    _dot(canvas, size, const Offset(.64, .30), 'רפי', kGreenSoft);
+    _dot(canvas, size, const Offset(.74, .60), 'משה', kGreenSoft);
+    _dot(canvas, size, const Offset(.42, .74), 'יוסי', kGreenSoft);
+    _call(canvas, size, const Offset(.52, .52));
   }
 
-  void _driver(Canvas canvas, Size size, Offset unit, String label) {
-    final pos = Offset(size.width * unit.dx, size.height * unit.dy);
-    final glow = Paint()
-      ..color = kGreen.withOpacity(.10)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+  void _dot(Canvas canvas, Size size, Offset unit, String label, Color color) {
+    final p = Offset(size.width * unit.dx, size.height * unit.dy);
+    canvas.drawCircle(p, 14, Paint()..color = color.withOpacity(.10));
+    canvas.drawCircle(p, 5, Paint()..color = color);
 
-    canvas.drawCircle(pos, 30, glow);
-    canvas.drawCircle(pos, 11, Paint()..color = kGreenSoft);
-
-    _label(canvas, label, pos.translate(36, -12), kGreenSoft);
-  }
-
-  void _call(Canvas canvas, Size size, Offset unit) {
-    final pos = Offset(size.width * unit.dx, size.height * unit.dy);
-    canvas.drawCircle(
-      pos,
-      52,
-      Paint()
-        ..color = kGold.withOpacity(.14)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 28),
-    );
-    canvas.drawCircle(pos, 24, Paint()..color = kGold.withOpacity(.22));
-    canvas.drawCircle(pos, 11, Paint()..color = kGold);
-  }
-
-  void _label(Canvas canvas, String text, Offset offset, Color accent) {
-    final textPainter = TextPainter(
+    final tp = TextPainter(
       textDirection: TextDirection.rtl,
       text: TextSpan(
-        text: text,
-        style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.w900),
+        text: label,
+        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900),
       ),
     )..layout();
 
-    final rect = Rect.fromLTWH(offset.dx - textPainter.width - 16, offset.dy - 15, textPainter.width + 32, 32);
+    tp.paint(canvas, p.translate(9, -18));
+  }
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(16)),
-      Paint()..color = Colors.black.withOpacity(.62),
+  void _call(Canvas canvas, Size size, Offset unit) {
+    final p = Offset(size.width * unit.dx, size.height * unit.dy);
+    canvas.drawCircle(
+      p,
+      30,
+      Paint()
+        ..color = kGold.withOpacity(.11)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
     );
-
-    textPainter.paint(canvas, Offset(rect.left + 16, rect.top + 8));
+    canvas.drawCircle(p, 10, Paint()..color = kGold);
   }
 
   @override
@@ -970,11 +987,11 @@ class ZoneStatsStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: const [
-        Expanded(child: ZoneStat(label: 'נהגים', value: '86', icon: Icons.local_taxi_rounded)),
-        SizedBox(width: 10),
-        Expanded(child: ZoneStat(label: 'קריאות', value: '24', icon: Icons.radio_button_checked_rounded)),
-        SizedBox(width: 10),
-        Expanded(child: ZoneStat(label: 'אזור', value: 'חם', icon: Icons.local_fire_department_rounded)),
+        Expanded(child: ZoneStat(label: 'נהגים', value: '86', icon: Icons.local_taxi_rounded, accent: kGreenSoft)),
+        SizedBox(width: 8),
+        Expanded(child: ZoneStat(label: 'קריאות', value: '24', icon: Icons.radio_button_checked_rounded, accent: kGreenSoft)),
+        SizedBox(width: 8),
+        Expanded(child: ZoneStat(label: 'עומס', value: 'גבוה', icon: Icons.local_fire_department_rounded, accent: kGold)),
       ],
     );
   }
@@ -984,41 +1001,71 @@ class ZoneStat extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
+  final Color accent;
 
   const ZoneStat({
     required this.label,
     required this.value,
     required this.icon,
+    required this.accent,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 46,
-      radius: 16,
+      height: 62,
+      radius: 14,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: kGreenSoft, size: 22),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              color: kGreenSoft,
-              fontSize: 19,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              color: const Color(0xFF8793A0),
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
+          Icon(icon, color: accent, size: 17),
+          const SizedBox(height: 3),
+          Text(value, style: TextStyle(color: accent, fontSize: 14, fontWeight: FontWeight.w900, height: 1)),
+          const SizedBox(height: 3),
+          Text(label, style: const TextStyle(color: Color(0xFF8793A0), fontSize: 10, fontWeight: FontWeight.w800)),
         ],
+      ),
+    );
+  }
+}
+
+class ZoneNetworkStatus extends StatelessWidget {
+  const ZoneNetworkStatus({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 16,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+        child: Row(
+          children: [
+            const Icon(Icons.sync_alt_rounded, color: kGreenSoft, size: 18),
+            const SizedBox(width: 9),
+            const Expanded(
+              child: Text(
+                'איזון אזור: חסרים 6 נהגים סביב בני ברק',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+              ),
+            ),
+            Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: kGreen.withOpacity(.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: kGreenSoft.withOpacity(.30)),
+              ),
+              child: const Text(
+                'נתב',
+                style: TextStyle(color: kGreenSoft, fontSize: 11, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1041,29 +1088,24 @@ class ZoneEventRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      height: 46,
-      radius: 16,
+      height: 50,
+      radius: 15,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: [
-            Icon(icon, color: accent, size: 28),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
+            Icon(icon, color: accent, size: 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
               ),
             ),
-            const Spacer(),
             Text(
               value,
-              style: TextStyle(
-                color: accent,
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-              ),
+              style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.w900),
             ),
           ],
         ),
@@ -1071,6 +1113,7 @@ class ZoneEventRow extends StatelessWidget {
     );
   }
 }
+
 
 class TrustReferenceScene extends StatelessWidget {
   const TrustReferenceScene({super.key});
