@@ -1574,6 +1574,7 @@ class DriverAvatar extends StatelessWidget {
 }
 
 
+
 class DriverLiveScene extends StatelessWidget {
   const DriverLiveScene({super.key});
 
@@ -1588,10 +1589,7 @@ class DriverLiveScene extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 880),
           child: Padding(
-            padding: EdgeInsets.only(
-              top: compact ? 6 : 24,
-              bottom: 10,
-            ),
+            padding: EdgeInsets.only(top: compact ? 6 : 24, bottom: 10),
             child: Column(
               children: const [
                 DriverActionHeader(),
@@ -1634,12 +1632,7 @@ class DriverActionHeader extends StatelessWidget {
                 children: [
                   Text(
                     'עבודת נהג',
-                    style: TextStyle(
-                      fontSize: 22,
-                      height: 1.05,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -.2,
-                    ),
+                    style: TextStyle(fontSize: 22, height: 1.05, fontWeight: FontWeight.w900),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -1675,7 +1668,6 @@ class DriverOnlinePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(11),
         border: Border.all(color: kGreenSoft.withOpacity(.35)),
       ),
-      alignment: Alignment.center,
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1683,11 +1675,7 @@ class DriverOnlinePill extends StatelessWidget {
           SizedBox(width: 5),
           Text(
             'על הקו',
-            style: TextStyle(
-              color: kGreenSoft,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-            ),
+            style: TextStyle(color: kGreenSoft, fontSize: 12, fontWeight: FontWeight.w900),
           ),
         ],
       ),
@@ -1708,10 +1696,7 @@ class DriverWorkPanel extends StatelessWidget {
           children: const [
             DriverLiveStatusCard(),
             SizedBox(height: 12),
-            SizedBox(
-              height: 218,
-              child: LiveMapCanvas(),
-            ),
+            SizedBox(height: 218, child: LiveMapCanvas()),
             SizedBox(height: 12),
             DriverWorkStats(),
             SizedBox(height: 12),
@@ -1747,12 +1732,7 @@ class DriverLiveStatusCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF17C985),
-            Color(0xFF73E6B4),
-          ],
-        ),
+        gradient: const LinearGradient(colors: [Color(0xFF17C985), Color(0xFF73E6B4)]),
         boxShadow: [
           BoxShadow(color: kGreen.withOpacity(.16), blurRadius: 20, offset: Offset(0, 7)),
         ],
@@ -1772,11 +1752,7 @@ class DriverLiveStatusCard extends StatelessWidget {
           const Expanded(
             child: Text(
               'זמין לקבלת קריאות',
-              style: TextStyle(
-                color: Color(0xFF03120B),
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
+              style: TextStyle(color: Color(0xFF03120B), fontSize: 15, fontWeight: FontWeight.w900),
             ),
           ),
           const Text(
@@ -1801,32 +1777,11 @@ class DriverWorkStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: const [
-        Expanded(
-          child: DriverWorkMetric(
-            icon: Icons.payments_rounded,
-            label: 'היום',
-            value: '₪740',
-            accent: kGreenSoft,
-          ),
-        ),
+        Expanded(child: DriverWorkMetric(icon: Icons.payments_rounded, label: 'היום', value: '₪740', accent: kGreenSoft)),
         SizedBox(width: 8),
-        Expanded(
-          child: DriverWorkMetric(
-            icon: Icons.verified_user_rounded,
-            label: 'אמון',
-            value: '98%',
-            accent: kGold,
-          ),
-        ),
+        Expanded(child: DriverWorkMetric(icon: Icons.verified_user_rounded, label: 'אמון', value: '98%', accent: kGold)),
         SizedBox(width: 8),
-        Expanded(
-          child: DriverWorkMetric(
-            icon: Icons.local_taxi_rounded,
-            label: 'קריאות',
-            value: '12',
-            accent: kGreenSoft,
-          ),
-        ),
+        Expanded(child: DriverWorkMetric(icon: Icons.local_taxi_rounded, label: 'קריאות', value: '12', accent: kGreenSoft)),
       ],
     );
   }
@@ -1856,24 +1811,9 @@ class DriverWorkMetric extends StatelessWidget {
         children: [
           Icon(icon, color: accent, size: 17),
           const SizedBox(height: 3),
-          Text(
-            value,
-            style: TextStyle(
-              color: accent,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              height: 1,
-            ),
-          ),
+          Text(value, style: TextStyle(color: accent, fontSize: 14, fontWeight: FontWeight.w900, height: 1)),
           const SizedBox(height: 3),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF8793A0),
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: Color(0xFF8793A0), fontSize: 10, fontWeight: FontWeight.w800)),
         ],
       ),
     );
@@ -1906,40 +1846,20 @@ class DriverPrimaryCall extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'קריאה מומלצת',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                  Text('קריאה מומלצת', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
                   SizedBox(height: 3),
                   Text(
                     'רמת גן → ירושלים · 9 דק׳ ממך',
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Color(0xFFAEB8C3),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(color: Color(0xFFAEB8C3), fontSize: 11, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              '₪240',
-              style: TextStyle(
-                color: kGold,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
+            const Text('₪240', style: TextStyle(color: kGold, fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(width: 10),
-            SizedBox(
-              width: 74,
-              child: NeonButton(label: 'קבל', compact: true),
-            ),
+            SizedBox(width: 74, child: NeonButton(label: 'קבל', compact: true)),
           ],
         ),
       ),
@@ -1977,35 +1897,13 @@ class DriverQueueRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                  Text(title, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 2),
-                  Text(
-                    meta,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF8793A0),
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text(meta, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF8793A0), fontSize: 10.5, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
-            Text(
-              value,
-              style: TextStyle(
-                color: accent,
-                fontSize: 13,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
+            Text(value, style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.w900)),
           ],
         ),
       ),
