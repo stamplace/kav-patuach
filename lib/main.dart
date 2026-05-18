@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 const kBg = Color(0xFF02070F);
@@ -6,6 +7,8 @@ const kPhone = Color(0xFF07111F);
 const kGreen = Color(0xFF12E391);
 const kGreenSoft = Color(0xFF62F2B6);
 const kGold = Color(0xFFF6C66D);
+
+enum VisualMode { night, day }
 
 void main() {
   runApp(const KavPatuachApp());
@@ -39,6 +42,7 @@ class AppHome extends StatefulWidget {
 
 class _AppHomeState extends State<AppHome> {
   int selected = 3;
+  VisualMode visualMode = VisualMode.night;
 
   final tabs = const [
     AppTab('ניהול', Icons.dashboard_rounded),
@@ -55,13 +59,19 @@ class _AppHomeState extends State<AppHome> {
       child: Scaffold(
         body: Stack(
           children: [
-            const CityBackdrop(),
+            CityBackdrop(mode: visualMode),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
                 child: Column(
                   children: [
-                    TopBar(onCall: () => setState(() => selected = 3)),
+                    TopBar(
+                      mode: visualMode,
+                      onCall: () => setState(() => selected = 3),
+                      onModeToggle: () => setState(
+                        () => visualMode = visualMode == VisualMode.night ? VisualMode.day : VisualMode.night,
+                      ),
+                    ),
                     const SizedBox(height: 18),
                     Expanded(
                       child: AnimatedSwitcher(
@@ -1652,95 +1662,228 @@ class TrustStrip extends StatelessWidget {
   }
 }
 
+
 class CityBackdrop extends StatelessWidget {
-  const CityBackdrop({super.key});
+  final VisualMode mode;
+
+  const CityBackdrop({required this.mode, super.key});
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: CityBackdropPainter(),
+      painter: CityBackdropPainter(mode),
       child: const SizedBox.expand(),
     );
   }
 }
 
 class CityBackdropPainter extends CustomPainter {
+  final VisualMode mode;
+
+  const CityBackdropPainter(this.mode);
+
+  bool get isDay => mode == VisualMode.day;
+
   @override
   void paint(Canvas canvas, Size size) {
+    final bgColors = isDay
+        ? const [
+            Color(0xFFE6FFF7),
+            Color(0xFF8EEBCF),
+            Color(0xFF14505B),
+            Color(0xFF03131C),
+          ]
+        : const [
+            Color(0xFF031D1A),
+            Color(0xFF061522),
+            Color(0xFF02070F),
+            Color(0xFF000000),
+          ];
+
     final bg = Paint()
-      ..shader = const LinearGradient(
+      ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFF063D32),
-          Color(0xFF061522),
-          Color(0xFF02070F),
-          Color(0xFF000000),
-        ],
+        colors: bgColors,
       ).createShader(Offset.zero & size);
 
     canvas.drawRect(Offset.zero & size, bg);
 
+    _drawSkyGlow(canvas, size);
+    _drawCityNetwork(canvas, size);
+    _drawPerspectiveGrid(canvas, size);
+    _drawSkyline(canvas, size);
+    _drawBottomFade(canvas, size);
+  }
+
+  void _drawSkyGlow(Canvas canvas, Size size) {
     final topGlow = Paint()
       ..shader = RadialGradient(
         colors: [
-          kGreen.withOpacity(.42),
+          kGreen.withOpacity(isDay ? .44 : .52),
+          kGreen.withOpacity(isDay ? .10 : .16),
           Colors.transparent,
         ],
       ).createShader(
         Rect.fromCircle(
-          center: Offset(size.width * .5, size.height * .04),
-          radius: size.width * .72,
+          center: Offset(size.width * .52, size.height * .08),
+          radius: size.width * .86,
         ),
       );
 
-    canvas.drawCircle(Offset(size.width * .5, size.height * .04), size.width * .72, topGlow);
+    canvas.drawCircle(
+      Offset(size.width * .52, size.height * .08),
+      size.width * .86,
+      topGlow,
+    );
 
+    final blueGlow = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          const Color(0xFF38BDF8).withOpacity(isDay ? .16 : .20),
+          Colors.transparent,
+        ],
+      ).createShader(
+        Rect.fromCircle(
+          center: Offset(size.width * .16, size.height * .30),
+          radius: size.width * .58,
+        ),
+      );
+
+    canvas.drawCircle(
+      Offset(size.width * .16, size.height * .30),
+      size.width * .58,
+      blueGlow,
+    );
+  }
+
+  void _drawPerspectiveGrid(Canvas canvas, Size size) {
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.055)
+      ..color = Colors.white.withOpacity(isDay ? .075 : .055)
       ..strokeWidth = 1;
 
-    for (double x = 0; x < size.width; x += 54) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
+    for (double x = -size.width; x < size.width * 2; x += 56) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + size.width * .36, size.height),
+        grid,
+      );
     }
 
-    for (double y = 0; y < size.height; y += 54) {
+    for (double y = 0; y < size.height; y += 56) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
     }
+  }
 
-    final skylinePaint = Paint()..color = const Color(0xFF05101B).withOpacity(.78);
-    final lightPaint = Paint()..color = kGreen.withOpacity(.38);
-    final heights = [42, 86, 58, 136, 72, 168, 94, 46, 122, 88, 54, 148, 76, 112];
+  void _drawCityNetwork(Canvas canvas, Size size) {
+    final road = Paint()
+      ..color = const Color(0xFF5EEAD4).withOpacity(isDay ? .20 : .14)
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
 
+    final glowRoad = Paint()
+      ..color = kGreen.withOpacity(isDay ? .16 : .20)
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9);
+
+    final roads = [
+      [Offset(.05, .72), Offset(.30, .58), Offset(.55, .52), Offset(.92, .38)],
+      [Offset(.15, .38), Offset(.38, .48), Offset(.62, .68), Offset(.92, .78)],
+      [Offset(.08, .55), Offset(.42, .34), Offset(.82, .18)],
+      [Offset(.28, .88), Offset(.44, .63), Offset(.72, .44)],
+      [Offset(.02, .30), Offset(.25, .42), Offset(.48, .36), Offset(.76, .50)],
+    ];
+
+    for (final roadPoints in roads) {
+      final path = Path()
+        ..moveTo(size.width * roadPoints.first.dx, size.height * roadPoints.first.dy);
+
+      for (var i = 1; i < roadPoints.length; i++) {
+        final p = roadPoints[i];
+        path.lineTo(size.width * p.dx, size.height * p.dy);
+      }
+
+      canvas.drawPath(path, glowRoad);
+      canvas.drawPath(path, road);
+    }
+
+    final nodePaint = Paint()..color = kGreenSoft.withOpacity(isDay ? .72 : .62);
+    final nodeGlow = Paint()
+      ..color = kGreen.withOpacity(.32)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
+
+    final nodes = [
+      Offset(.22, .39),
+      Offset(.36, .50),
+      Offset(.51, .53),
+      Offset(.67, .45),
+      Offset(.82, .36),
+      Offset(.44, .68),
+      Offset(.75, .72),
+    ];
+
+    for (final n in nodes) {
+      final pos = Offset(size.width * n.dx, size.height * n.dy);
+      canvas.drawCircle(pos, 13, nodeGlow);
+      canvas.drawCircle(pos, 3.6, nodePaint);
+    }
+  }
+
+  void _drawSkyline(Canvas canvas, Size size) {
+    final skylinePaint = Paint()
+      ..color = (isDay ? const Color(0xFF063140) : const Color(0xFF030A13)).withOpacity(.82);
+
+    final windowPaint = Paint()
+      ..color = (isDay ? Colors.white : kGold).withOpacity(isDay ? .22 : .42);
+
+    final heights = [46, 92, 58, 142, 74, 176, 104, 48, 132, 92, 52, 160, 82, 118, 62, 146];
     final w = size.width / heights.length;
 
     for (var i = 0; i < heights.length; i++) {
       final h = heights[i].toDouble();
-      final rect = Rect.fromLTWH(i * w + 3, size.height - h, w - 6, h);
+      final rect = Rect.fromLTWH(i * w + 2, size.height - h, w - 5, h);
       canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(4)), skylinePaint);
-      if (i.isEven) {
-        canvas.drawCircle(Offset(rect.center.dx, rect.top + 18), 2.2, lightPaint);
+
+      for (double y = rect.top + 18; y < rect.bottom - 10; y += 22) {
+        if ((y / 22 + i).floor().isEven) {
+          canvas.drawCircle(Offset(rect.center.dx, y), 1.6, windowPaint);
+        }
       }
     }
+  }
 
+  void _drawBottomFade(Canvas canvas, Size size) {
     final fade = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Colors.transparent, Colors.black.withOpacity(.82)],
-      ).createShader(Rect.fromLTWH(0, size.height * .64, size.width, size.height * .36));
+        colors: [
+          Colors.transparent,
+          Colors.black.withOpacity(isDay ? .58 : .88),
+        ],
+      ).createShader(Rect.fromLTWH(0, size.height * .58, size.width, size.height * .42));
 
-    canvas.drawRect(Rect.fromLTWH(0, size.height * .64, size.width, size.height * .36), fade);
+    canvas.drawRect(Rect.fromLTWH(0, size.height * .58, size.width, size.height * .42), fade);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CityBackdropPainter oldDelegate) => oldDelegate.mode != mode;
 }
 
-class TopBar extends StatelessWidget {
-  final VoidCallback onCall;
 
-  const TopBar({required this.onCall, super.key});
+
+class TopBar extends StatelessWidget {
+  final VisualMode mode;
+  final VoidCallback onCall;
+  final VoidCallback onModeToggle;
+
+  const TopBar({
+    required this.mode,
+    required this.onCall,
+    required this.onModeToggle,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1748,11 +1891,16 @@ class TopBar extends StatelessWidget {
       height: 72,
       radius: 38,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         child: Row(
           children: [
             const BrandSmall(),
             const Spacer(),
+            GestureDetector(
+              onTap: onModeToggle,
+              child: ModeToggleChip(mode: mode),
+            ),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: onCall,
               child: const NeonButton(label: 'פתח קריאה', compact: true),
@@ -1763,6 +1911,41 @@ class TopBar extends StatelessWidget {
     );
   }
 }
+
+class ModeToggleChip extends StatelessWidget {
+  final VisualMode mode;
+
+  const ModeToggleChip({required this.mode, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDay = mode == VisualMode.day;
+
+    return Container(
+      height: 48,
+      width: 54,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.black.withOpacity(.24),
+        border: Border.all(
+          color: (isDay ? kGold : kGreenSoft).withOpacity(.55),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (isDay ? kGold : kGreen).withOpacity(.22),
+            blurRadius: 26,
+          ),
+        ],
+      ),
+      child: Icon(
+        isDay ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded,
+        color: isDay ? kGold : kGreenSoft,
+        size: 22,
+      ),
+    );
+  }
+}
+
 
 class BrandSmall extends StatelessWidget {
   const BrandSmall({super.key});
@@ -2087,6 +2270,7 @@ class LiveMapCanvas extends StatelessWidget {
   }
 }
 
+
 class LiveMapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -2094,13 +2278,21 @@ class LiveMapPainter extends CustomPainter {
       ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFF04101B), Color(0xFF081B22), Color(0xFF020711)],
+        colors: [Color(0xFF020711), Color(0xFF061B22), Color(0xFF01040B)],
       ).createShader(Offset.zero & size);
 
     canvas.drawRect(Offset.zero & size, bg);
 
+    _drawMapTexture(canvas, size);
+    _drawCoast(canvas, size);
+    _drawRoute(canvas, size);
+    _drawPins(canvas, size);
+    _drawLabels(canvas, size);
+  }
+
+  void _drawMapTexture(Canvas canvas, Size size) {
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.07)
+      ..color = Colors.white.withOpacity(.055)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 34) {
@@ -2111,69 +2303,151 @@ class LiveMapPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
     }
 
-    final route = Paint()
-      ..color = kGreen.withOpacity(.58)
-      ..strokeWidth = 4
+    final road = Paint()
+      ..color = const Color(0xFF5EEAD4).withOpacity(.14)
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
-    final path = Path()
+    for (var i = 0; i < 7; i++) {
+      final y = size.height * (.18 + i * .11);
+      final path = Path()
+        ..moveTo(size.width * .06, y)
+        ..quadraticBezierTo(
+          size.width * (.28 + math.sin(i) * .04),
+          y + 24,
+          size.width * .52,
+          y - 8,
+        )
+        ..quadraticBezierTo(
+          size.width * .72,
+          y - 28,
+          size.width * .95,
+          y + 12,
+        );
+      canvas.drawPath(path, road);
+    }
+  }
+
+  void _drawCoast(Canvas canvas, Size size) {
+    final coast = Path()
+      ..moveTo(0, size.height * .22)
+      ..cubicTo(size.width * .18, size.height * .28, size.width * .08, size.height * .52, size.width * .22, size.height * .66)
+      ..cubicTo(size.width * .30, size.height * .76, size.width * .18, size.height * .92, 0, size.height);
+
+    canvas.drawPath(
+      coast,
+      Paint()
+        ..color = const Color(0xFF38BDF8).withOpacity(.08)
+        ..style = PaintingStyle.fill,
+    );
+
+    canvas.drawPath(
+      coast,
+      Paint()
+        ..color = const Color(0xFF38BDF8).withOpacity(.24)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+    );
+  }
+
+  void _drawRoute(Canvas canvas, Size size) {
+    final route = Path()
       ..moveTo(size.width * .16, size.height * .72)
-      ..quadraticBezierTo(size.width * .43, size.height * .58, size.width * .52, size.height * .42)
-      ..quadraticBezierTo(size.width * .68, size.height * .14, size.width * .86, size.height * .24);
+      ..cubicTo(
+        size.width * .32,
+        size.height * .62,
+        size.width * .45,
+        size.height * .48,
+        size.width * .52,
+        size.height * .42,
+      )
+      ..cubicTo(
+        size.width * .64,
+        size.height * .30,
+        size.width * .74,
+        size.height * .20,
+        size.width * .88,
+        size.height * .25,
+      );
 
-    canvas.drawPath(path, route);
+    canvas.drawPath(
+      route,
+      Paint()
+        ..color = kGreen.withOpacity(.22)
+        ..strokeWidth = 16
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+    );
 
-    final center = Offset(size.width * .5, size.height * .5);
-    final halo = Paint()
-      ..shader = RadialGradient(
-        colors: [kGreen.withOpacity(.36), Colors.transparent],
-      ).createShader(Rect.fromCircle(center: center, radius: size.width * .38));
-
-    canvas.drawCircle(center, size.width * .38, halo);
-
-    _pin(canvas, Offset(size.width * .5, size.height * .5), 18);
-    _pin(canvas, Offset(size.width * .22, size.height * .36), 11);
-    _pin(canvas, Offset(size.width * .74, size.height * .36), 11);
-    _pin(canvas, Offset(size.width * .31, size.height * .76), 11);
-
-    _label(canvas, 'קריאה פתוחה', Offset(size.width * .56, size.height * .20));
-    _label(canvas, 'אבי · 4 דק׳', Offset(size.width * .65, size.height * .48));
-    _label(canvas, 'רפי · 7 דק׳', Offset(size.width * .18, size.height * .52));
+    canvas.drawPath(
+      route,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [kGreen, kGreenSoft],
+        ).createShader(Offset.zero & size)
+        ..strokeWidth = 5
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke,
+    );
   }
 
-  void _pin(Canvas canvas, Offset offset, double r) {
+  void _drawPins(Canvas canvas, Size size) {
+    _pin(canvas, Offset(size.width * .50, size.height * .50), 18, kGreenSoft);
+    _pin(canvas, Offset(size.width * .22, size.height * .36), 11, kGreenSoft);
+    _pin(canvas, Offset(size.width * .74, size.height * .36), 11, kGreenSoft);
+    _pin(canvas, Offset(size.width * .31, size.height * .76), 11, kGreenSoft);
+    _pin(canvas, Offset(size.width * .84, size.height * .24), 13, kGold);
+  }
+
+  void _drawLabels(Canvas canvas, Size size) {
+    _label(canvas, 'קריאה פתוחה', Offset(size.width * .56, size.height * .20), Colors.white);
+    _label(canvas, 'אבי · 4 דק׳', Offset(size.width * .65, size.height * .48), kGreenSoft);
+    _label(canvas, 'רפי · 7 דק׳', Offset(size.width * .18, size.height * .52), Colors.white);
+  }
+
+  void _pin(Canvas canvas, Offset offset, double r, Color color) {
     final glow = Paint()
-      ..color = kGreen.withOpacity(.22)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+      ..color = color.withOpacity(.26)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
 
-    canvas.drawCircle(offset, r * 3, glow);
-
-    final dot = Paint()..color = kGreenSoft;
-    canvas.drawCircle(offset, r, dot);
+    canvas.drawCircle(offset, r * 3.2, glow);
+    canvas.drawCircle(offset, r, Paint()..color = color.withOpacity(.92));
+    canvas.drawCircle(offset, r * .42, Paint()..color = Colors.white.withOpacity(.72));
   }
 
-  void _label(Canvas canvas, String text, Offset offset) {
+  void _label(Canvas canvas, String text, Offset offset, Color color) {
     final textPainter = TextPainter(
       textDirection: TextDirection.rtl,
       text: TextSpan(
         text: text,
-        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900),
+        style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w900),
       ),
     )..layout();
 
-    final rect = Rect.fromLTWH(offset.dx - textPainter.width - 16, offset.dy - 15, textPainter.width + 32, 34);
+    final rect = Rect.fromLTWH(offset.dx - textPainter.width - 18, offset.dy - 16, textPainter.width + 36, 36);
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(18)),
-      Paint()..color = Colors.black.withOpacity(.68),
+      Paint()..color = Colors.black.withOpacity(.72),
     );
 
-    textPainter.paint(canvas, Offset(rect.left + 16, rect.top + 8));
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(18)),
+      Paint()
+        ..color = kGreen.withOpacity(.20)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+
+    textPainter.paint(canvas, Offset(rect.left + 18, rect.top + 9));
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
 
 class CallList extends StatelessWidget {
   const CallList({super.key});
@@ -2430,11 +2704,19 @@ class GlassPanel extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: kPanel.withOpacity(.76),
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            kPanel.withOpacity(.90),
+            const Color(0xFF020A14).withOpacity(.82),
+          ],
+        ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.11)),
-        boxShadow: const [
-          BoxShadow(color: Colors.black54, blurRadius: 30, offset: Offset(0, 16)),
+        border: Border.all(color: Colors.white.withOpacity(.16)),
+        boxShadow: [
+          const BoxShadow(color: Colors.black87, blurRadius: 34, offset: Offset(0, 18)),
+          BoxShadow(color: kGreen.withOpacity(.08), blurRadius: 44, spreadRadius: 1),
         ],
       ),
       child: child,
