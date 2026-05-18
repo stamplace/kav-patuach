@@ -1,19 +1,19 @@
 import { ProductShell } from "@/components/ProductShell";
-import { ActionPanel, AppField, NeonButton, RouteCard, SegmentControl } from "@/components/app/AppControls";
+import { AppField, NeonButton, RouteCard, SegmentControl } from "@/components/app/AppControls";
 import {
+  DriverOfferCard,
   GlowCard,
   LiveMap,
   MetricCard,
   PhoneFrame,
   StatusPill,
   TrustBadge,
-  DriverOfferCard,
 } from "@/components/visual/PremiumPrimitives";
 
 const driverOffers = [
-  { name: "אבי", eta: "4 דק׳", trust: "96%", note: "קרוב אליך" },
-  { name: "רפי", eta: "7 דק׳", trust: "98%", note: "נהג זהב" },
-  { name: "משה", eta: "11 דק׳", trust: "95%", note: "הצעה טובה" },
+  { name: "אבי", eta: "4 דק׳", trust: "96%", note: "קרוב" },
+  { name: "רפי", eta: "7 דק׳", trust: "98%", note: "זהב" },
+  { name: "משה", eta: "11 דק׳", trust: "95%", note: "זמין" },
 ];
 
 const liveCalls = [
@@ -31,10 +31,10 @@ const adminMetrics = [
 
 function AppHeader({ title, badge }: { title: string; badge: string }) {
   return (
-    <div className="mb-6 flex items-center justify-between gap-4">
+    <div className="mb-5 flex items-center justify-between gap-4">
       <div>
         <p className="text-sm font-black text-emerald-300">{badge}</p>
-        <h1 className="mt-2 text-5xl font-black tracking-tight">{title}</h1>
+        <h1 className="mt-1 text-4xl font-black tracking-tight sm:text-5xl">{title}</h1>
       </div>
       <StatusPill tone="emerald">Live</StatusPill>
     </div>
@@ -52,28 +52,37 @@ function PhoneTop() {
   );
 }
 
+function BrandHero() {
+  return (
+    <div className="text-center lg:text-right">
+      <p className="mx-auto mb-4 inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-100 backdrop-blur-xl lg:mx-0">
+        Live Network
+      </p>
+      <h1 className="text-6xl font-black leading-[.9] tracking-tight sm:text-8xl lg:text-9xl">
+        קו <span className="text-emerald-400">פתוח</span>
+      </h1>
+      <p className="mt-4 text-3xl font-black leading-tight text-slate-100">
+        קריאה. נהג. נסיעה.
+      </p>
+    </div>
+  );
+}
 
 export function HomeSurface() {
   return (
     <ProductShell active="home" badge="קו פתוח">
-      <section className="grid min-h-[70vh] gap-8 lg:grid-cols-[1fr_460px] lg:items-center">
-        <div>
-          <StatusPill tone="emerald">Live Network</StatusPill>
-          <h1 className="mt-6 text-6xl font-black leading-[.9] tracking-tight sm:text-9xl">
-            קו <span className="text-emerald-400">פתוח</span>
-          </h1>
-          <p className="mt-5 max-w-2xl text-3xl font-black leading-tight">
-            קריאה. נהג. נסיעה.
-          </p>
+      <section className="grid gap-8 lg:min-h-[78vh] lg:grid-cols-[1fr_430px] lg:items-center">
+        <div className="order-1 lg:order-none">
+          <BrandHero />
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
               { href: "/customer", title: "פתח קריאה" },
               { href: "/driver", title: "אני על הקו" },
               { href: "/admin", title: "לוח בקרה" },
               { href: "/experience", title: "חוויה" },
             ].map((item) => (
-              <a key={item.href} href={item.href} className="rounded-[2rem] border border-white/10 bg-white/[0.055] p-6 text-2xl font-black shadow-2xl shadow-black/25 transition hover:-translate-y-1 hover:bg-white/[0.08]">
+              <a key={item.href} href={item.href} className="rounded-[1.7rem] border border-white/10 bg-[#071523]/72 p-5 text-2xl font-black shadow-2xl shadow-black/30 backdrop-blur-2xl transition hover:-translate-y-1">
                 {item.title}
               </a>
             ))}
@@ -83,14 +92,14 @@ export function HomeSurface() {
         <PhoneFrame>
           <PhoneTop />
           <LiveMap className="h-72 sm:h-80" />
-          <div className="mt-5 grid grid-cols-[1fr_auto] gap-3">
+          <div className="mt-4 grid grid-cols-[1fr_auto] gap-3">
             <GlowCard className="rounded-[1.6rem] p-4">
-              <p className="text-sm font-bold text-slate-400">קריאה פעילה</p>
-              <p className="mt-1 text-2xl font-black">3 נהגים הגיבו</p>
+              <p className="text-xs font-black text-slate-400">קריאה פעילה</p>
+              <p className="mt-1 text-2xl font-black">3 נהגים</p>
             </GlowCard>
             <TrustBadge value="98%" />
           </div>
-          <a href="/customer" className="mt-5 block rounded-[1.7rem] bg-emerald-400 p-5 text-center text-2xl font-black text-[#03120b] sm:text-3xl">
+          <a href="/customer" className="mt-4 block rounded-[1.7rem] bg-emerald-400 p-5 text-center text-2xl font-black text-[#03120b] shadow-[0_0_48px_rgba(16,185,129,.38)]">
             פתח קריאה
           </a>
         </PhoneFrame>
@@ -102,7 +111,7 @@ export function HomeSurface() {
 export function CustomerSurface() {
   return (
     <ProductShell active="customer" badge="לקוח">
-      <section className="grid gap-8 lg:grid-cols-[460px_1fr] lg:items-start">
+      <section className="grid gap-8 lg:grid-cols-[430px_1fr] lg:items-start">
         <PhoneFrame>
           <PhoneTop />
           <h1 className="text-center text-4xl font-black sm:text-5xl">לאן נוסעים?</h1>
@@ -130,9 +139,9 @@ export function CustomerSurface() {
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <MetricCard label="זמן ממוצע" value="7 דק׳" />
+            <MetricCard label="זמן" value="7 דק׳" />
             <MetricCard label="אמון" value="98%" />
-            <MetricCard label="נסיעות היום" value="248" />
+            <MetricCard label="נסיעות" value="248" />
           </div>
         </div>
       </section>
@@ -187,7 +196,7 @@ export function AdminSurface() {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <GlowCard>
             <h2 className="text-3xl font-black">קריאות פעילות</h2>
             <div className="mt-5 space-y-4">
@@ -221,7 +230,7 @@ export function AdminSurface() {
           </GlowCard>
 
           <GlowCard>
-            <h2 className="text-3xl font-black">דיווחים לבדיקה</h2>
+            <h2 className="text-3xl font-black">דיווחים</h2>
             <div className="mt-5 space-y-4">
               {["התנהגות לא הולמת", "ביטול חריג", "נהיגה לא בטוחה"].map((item) => (
                 <div key={item} className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 font-bold text-amber-100">
@@ -237,11 +246,5 @@ export function AdminSurface() {
 }
 
 export function ExperienceSurface() {
-  return (
-    <ProductShell active="experience" badge="אפליקציה חיה">
-      <section className="grid gap-8">
-        <HomeSurface />
-      </section>
-    </ProductShell>
-  );
+  return <HomeSurface />;
 }
