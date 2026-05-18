@@ -69,7 +69,7 @@ function Field({ label }: { label: string }) {
 
 export function HomeSurface() {
   return (
-    <ProductShell active="experience" badge="קו פתוח · מוצר חי">
+    <ProductShell active="home" badge="קו פתוח">
       <section className="grid min-h-[76vh] gap-10 lg:grid-cols-[1fr_460px] lg:items-center">
         <div>
           <StatusPill tone="emerald">רשת קריאות לנהגים ולקוחות</StatusPill>
