@@ -1,37 +1,11 @@
 # קו פתוח
 
-רשת קריאות לנהגים ולקוחות.
+Flutter-first premium app.
 
-## משפט מוצר
+## Status
 
-פותחים קריאה. נהגים מגיבים. נוסעים באמון.
+React/Next archived:
+- branch: `archive/react-next-before-flutter`
+- tag: `react-next-before-flutter-pivot`
 
-## מה זה
-
-קו פתוח היא תשתית קריאות לנסיעות.
-
-הלקוח לא "מזמין מונית".
-הוא פותח קריאה.
-
-הנהג לא "מחכה לאלגוריתם".
-הוא נכנס למרחב קריאות, מגיב, מציע, נבחר ובונה אמון.
-
-## נקודות קצה
-
-| ממשק | נתיב | תפקיד |
-|---|---|---|
-| Landing | `/` | דף נחיתה והצגת חזון |
-| Premium | `/premium` | תצוגת פרימיום מלאה להצגת המוצר |
-| Experience | `/experience` | המחשה חיה קרובה לתמונות הרפרנס |
-| Customer | `/customer` | לקוח פותח קריאה |
-| Driver | `/driver` | נהג רואה ומנהל קריאות |
-| Admin | `/admin` | לוח בקרה וניהול |
-
-## מסמכי מוצר
-
-- `docs/client-demo/demo-map.md`
-- `docs/product/interface-plan.md`
-
-## סטטוס
-
-V0.3 — ארבע נקודות קצה + תצוגת פרימיום + חוויית Visual Product Engine.
+Main is now Flutter.
