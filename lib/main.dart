@@ -11,6 +11,8 @@ const kGold = Color(0xFFF6C66D);
 
 enum VisualMode { night, day }
 
+// OVERLAY_TUNING_PASS_01: premium image assets are the visual base; UI must stay thin and readable.
+
 
 class PremiumAssetBackground extends StatelessWidget {
   final VisualMode mode;
@@ -153,8 +155,8 @@ class KavPatuachApp extends StatelessWidget {
         textTheme: GoogleFonts.heeboTextTheme(
           ThemeData(brightness: Brightness.dark, useMaterial3: true).textTheme,
         ).apply(
-          bodyColor: const Color(0xFFF3F7FA),
-          displayColor: const Color(0xFFF3F7FA),
+          bodyColor: const Color(0xFFEAF1F4),
+          displayColor: const Color(0xFFEAF1F4),
         ),
       ),
       home: const AppHome(),
@@ -447,7 +449,7 @@ class AdminMetricTile extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white60,
+              color: const Color(0xFF8793A0),
               fontSize: 13,
               fontWeight: FontWeight.w900,
             ),
@@ -895,7 +897,7 @@ class ZoneStat extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white60,
+              color: const Color(0xFF8793A0),
               fontSize: 11,
               fontWeight: FontWeight.w900,
             ),
@@ -1049,7 +1051,7 @@ class TrustScorePanel extends StatelessWidget {
           Text(
             'מדד אמון',
             style: TextStyle(
-              color: Colors.white70,
+              color: const Color(0xFFAEB8C3),
               fontSize: 14,
               fontWeight: FontWeight.w900,
             ),
@@ -1152,7 +1154,7 @@ class TrustCapabilityCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Colors.white70,
+              color: const Color(0xFFAEB8C3),
               fontSize: 13,
               fontWeight: FontWeight.w900,
             ),
@@ -1188,7 +1190,7 @@ class TrustBottomPromise extends StatelessWidget {
           Text(
             'פרטיות · אימות · שירות אנושי',
             style: TextStyle(
-              color: Colors.white70,
+              color: const Color(0xFFAEB8C3),
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1268,7 +1270,7 @@ class DriverOffersScene extends StatelessWidget {
                         Text(
                           'נהגים שאומתו על ידי קו פתוח',
                           style: TextStyle(
-                            color: Colors.white54,
+                            color: const Color(0xFF7E8995),
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -1309,7 +1311,7 @@ class OfferStatusHeart extends StatelessWidget {
         const Text(
           'בחר נהג לפי אמון, זמן והצעה',
           style: TextStyle(
-            color: Colors.white70,
+            color: const Color(0xFFAEB8C3),
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -1579,7 +1581,7 @@ class DriverStatBox extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white60,
+              color: const Color(0xFF8793A0),
               fontSize: 11,
               fontWeight: FontWeight.w900,
             ),
@@ -1644,7 +1646,7 @@ class DriverLiveCallCard extends StatelessWidget {
                     '$route · $eta',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Colors.white60,
+                      color: const Color(0xFF8793A0),
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                     ),
@@ -1769,21 +1771,21 @@ class TrustStrip extends StatelessWidget {
           SizedBox(width: 10),
           Text(
             'נהגים נבחרים',
-            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+            style: TextStyle(fontWeight: FontWeight.w900, color: const Color(0xFFAEB8C3)),
           ),
           SizedBox(width: 12),
           Text('·', style: TextStyle(color: kGold, fontWeight: FontWeight.w900)),
           SizedBox(width: 12),
           Text(
             'ביטוח מלא',
-            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+            style: TextStyle(fontWeight: FontWeight.w900, color: const Color(0xFFAEB8C3)),
           ),
           SizedBox(width: 12),
           Text('·', style: TextStyle(color: kGold, fontWeight: FontWeight.w900)),
           SizedBox(width: 12),
           Text(
             'דירוגים אמיתיים',
-            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white70),
+            style: TextStyle(fontWeight: FontWeight.w900, color: const Color(0xFFAEB8C3)),
           ),
         ],
       ),
@@ -2226,11 +2228,11 @@ class PhoneHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: const [
-        Icon(Icons.notifications_none_rounded, color: Colors.white70),
+        Icon(Icons.notifications_none_rounded, color: const Color(0xFFAEB8C3)),
         Spacer(),
         BrandSmall(),
         Spacer(),
-        Icon(Icons.menu_rounded, color: Colors.white70),
+        Icon(Icons.menu_rounded, color: const Color(0xFFAEB8C3)),
       ],
     );
   }
@@ -2682,7 +2684,7 @@ class SegmentButton extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          color: active ? Colors.white : Colors.white60,
+          color: active ? Colors.white : const Color(0xFF8793A0),
           fontSize: 14,
           fontWeight: FontWeight.w800,
         ),
@@ -2839,15 +2841,15 @@ class GlassPanel extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            kPanel.withOpacity(.82),
-            const Color(0xFF030912).withOpacity(.76),
+            const Color(0xFF07111D).withOpacity(.66),
+            const Color(0xFF020711).withOpacity(.58),
           ],
         ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.10), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(.085), width: 1),
         boxShadow: [
-          const BoxShadow(color: Colors.black54, blurRadius: 18, offset: Offset(0, 10)),
-          BoxShadow(color: kGreen.withOpacity(.045), blurRadius: 28),
+          const BoxShadow(color: Colors.black45, blurRadius: 16, offset: Offset(0, 9)),
+          BoxShadow(color: kGreen.withOpacity(.028), blurRadius: 22),
         ],
       ),
       child: child,
@@ -2872,8 +2874,8 @@ class NeonButton extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient: const LinearGradient(colors: [Color(0xFF08C985), Color(0xFF22F08E)]),
-        boxShadow: [BoxShadow(color: kGreen.withOpacity(.35), blurRadius: 34)],
+        gradient: const LinearGradient(colors: [Color(0xFF13C783), Color(0xFF5EEAB0)]),
+        boxShadow: [BoxShadow(color: kGreen.withOpacity(.18), blurRadius: 20, offset: Offset(0, 7))],
       ),
       alignment: Alignment.center,
       child: Text(
@@ -2962,7 +2964,7 @@ class BottomNav extends StatelessWidget {
                 duration: const Duration(milliseconds: 220),
                 margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
                 decoration: BoxDecoration(
-                  color: active ? kGreen : Colors.transparent,
+                  color: active ? const Color(0xFF5EEAB0) : Colors.transparent,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -2970,14 +2972,14 @@ class BottomNav extends StatelessWidget {
                   children: [
                     Icon(
                       tabs[index].icon,
-                      color: active ? const Color(0xFF03120B) : Colors.white70,
+                      color: active ? const Color(0xFF03120B) : const Color(0xFFAEB8C3),
                       size: 18,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       tabs[index].label,
                       style: TextStyle(
-                        color: active ? const Color(0xFF03120B) : Colors.white70,
+                        color: active ? const Color(0xFF03120B) : const Color(0xFFAEB8C3),
                         fontWeight: FontWeight.w900,
                         fontSize: 11,
                       ),
@@ -3607,16 +3609,16 @@ class StudioPanel extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            Color(0xE60A1520),
-            Color(0xD9030911),
+            const Color(0xFF0A1520).withOpacity(.66),
+            const Color(0xFF030911).withOpacity(.58),
           ],
         ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.095), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(.075), width: 1),
         boxShadow: [
           const BoxShadow(
             color: Color(0x99000000),
@@ -3624,8 +3626,8 @@ class StudioPanel extends StatelessWidget {
             offset: Offset(0, 14),
           ),
           BoxShadow(
-            color: kGreen.withOpacity(.055),
-            blurRadius: 34,
+            color: kGreen.withOpacity(.025),
+            blurRadius: 22,
           ),
         ],
       ),
@@ -3658,13 +3660,13 @@ class StudioActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF1BE08F),
-              Color(0xFF67F2BC),
+              Color(0xFF13C783),
+              Color(0xFF5EEAB0),
             ],
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: kGreen.withOpacity(.22), blurRadius: 22, offset: const Offset(0, 8)),
+            BoxShadow(color: kGreen.withOpacity(.14), blurRadius: 16, offset: const Offset(0, 6)),
           ],
         ),
         child: Text(
@@ -4253,7 +4255,7 @@ class StudioBottomNav extends StatelessWidget {
                 duration: const Duration(milliseconds: 180),
                 height: 46,
                 decoration: BoxDecoration(
-                  color: active ? kGreen : Colors.transparent,
+                  color: active ? const Color(0xFF5EEAB0) : Colors.transparent,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
