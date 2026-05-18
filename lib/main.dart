@@ -28,7 +28,7 @@ class KavPatuachApp extends StatelessWidget {
         fontFamily: 'Arial',
         scaffoldBackgroundColor: kBg,
       ),
-      home: const AppHome(),
+      home: const StudioHome(),
     );
   }
 }
@@ -2849,6 +2849,1293 @@ class BottomNav extends StatelessWidget {
                         color: active ? const Color(0xFF03120B) : Colors.white70,
                         fontWeight: FontWeight.w900,
                         fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+
+
+// ============================================================
+// STUDIO SHELL V2 — premium product surface
+// This shell intentionally overrides the old prototype screens.
+// Old scenes remain in file as archive/reference.
+// ============================================================
+
+class StudioHome extends StatefulWidget {
+  const StudioHome({super.key});
+
+  @override
+  State<StudioHome> createState() => _StudioHomeState();
+}
+
+class _StudioHomeState extends State<StudioHome> {
+  int selected = 3;
+  VisualMode mode = VisualMode.night;
+
+  final tabs = const [
+    AppTab('ניהול', Icons.grid_view_rounded),
+    AppTab('נהג', Icons.local_taxi_rounded),
+    AppTab('מרחב', Icons.hub_rounded),
+    AppTab('לקוח', Icons.person_rounded),
+    AppTab('אמון', Icons.verified_user_rounded),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            StudioBackdrop(mode: mode),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+                child: Column(
+                  children: [
+                    StudioTopBar(
+                      mode: mode,
+                      onCall: () => setState(() => selected = 3),
+                      onMode: () => setState(() {
+                        mode = mode == VisualMode.night ? VisualMode.day : VisualMode.night;
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: StudioScene(
+                          key: ValueKey('$selected-$mode'),
+                          selected: selected,
+                          mode: mode,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    StudioBottomNav(
+                      tabs: tabs,
+                      selected: selected,
+                      onSelect: (v) => setState(() => selected = v),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class StudioBackdrop extends StatelessWidget {
+  final VisualMode mode;
+
+  const StudioBackdrop({required this.mode, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: StudioBackdropPainter(mode),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class StudioBackdropPainter extends CustomPainter {
+  final VisualMode mode;
+
+  const StudioBackdropPainter(this.mode);
+
+  bool get isDay => mode == VisualMode.day;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: isDay
+            ? const [
+                Color(0xFFEFFAF7),
+                Color(0xFFDDEDEA),
+                Color(0xFFBFD6D8),
+                Color(0xFF0B1724),
+              ]
+            : const [
+                Color(0xFF020611),
+                Color(0xFF07111D),
+                Color(0xFF08131C),
+                Color(0xFF000000),
+              ],
+      ).createShader(Offset.zero & size);
+
+    canvas.drawRect(Offset.zero & size, base);
+
+    _radial(canvas, size, Offset(.50, .10), isDay ? kGreen.withOpacity(.18) : kGreen.withOpacity(.28), size.width * .82);
+    _radial(canvas, size, Offset(.10, .58), const Color(0xFF38BDF8).withOpacity(isDay ? .08 : .13), size.width * .68);
+    _radial(canvas, size, Offset(.86, .40), kGold.withOpacity(isDay ? .08 : .10), size.width * .48);
+
+    _drawPrecisionGrid(canvas, size);
+    _drawSignalLines(canvas, size);
+    _drawSkyline(canvas, size);
+    _drawVignette(canvas, size);
+  }
+
+  void _radial(Canvas canvas, Size size, Offset unit, Color color, double radius) {
+    final center = Offset(size.width * unit.dx, size.height * unit.dy);
+    final paint = Paint()
+      ..shader = RadialGradient(
+        colors: [color, Colors.transparent],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  void _drawPrecisionGrid(Canvas canvas, Size size) {
+    final grid = Paint()
+      ..color = Colors.white.withOpacity(isDay ? .045 : .038)
+      ..strokeWidth = .8;
+
+    for (double x = 0; x < size.width; x += 42) {
+      canvas.drawLine(Offset(x, 0), Offset(x + size.width * .08, size.height), grid);
+    }
+
+    for (double y = 0; y < size.height; y += 42) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+    }
+  }
+
+  void _drawSignalLines(Canvas canvas, Size size) {
+    final soft = Paint()
+      ..color = kGreenSoft.withOpacity(isDay ? .10 : .14)
+      ..strokeWidth = 1.1
+      ..strokeCap = StrokeCap.round;
+
+    final glow = Paint()
+      ..color = kGreen.withOpacity(isDay ? .05 : .08)
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
+
+    final paths = [
+      [Offset(.04, .70), Offset(.28, .58), Offset(.55, .62), Offset(.94, .48)],
+      [Offset(.15, .30), Offset(.40, .42), Offset(.73, .32), Offset(.96, .36)],
+      [Offset(.08, .52), Offset(.31, .48), Offset(.58, .38), Offset(.88, .24)],
+    ];
+
+    for (final pts in paths) {
+      final path = Path()..moveTo(size.width * pts.first.dx, size.height * pts.first.dy);
+      for (var i = 1; i < pts.length; i++) {
+        path.lineTo(size.width * pts[i].dx, size.height * pts[i].dy);
+      }
+      canvas.drawPath(path, glow);
+      canvas.drawPath(path, soft);
+    }
+
+    final nodes = [Offset(.26, .58), Offset(.55, .62), Offset(.72, .32), Offset(.88, .24)];
+    for (final n in nodes) {
+      final o = Offset(size.width * n.dx, size.height * n.dy);
+      canvas.drawCircle(o, 11, Paint()..color = kGreen.withOpacity(.10));
+      canvas.drawCircle(o, 2.4, Paint()..color = kGreenSoft.withOpacity(.78));
+    }
+  }
+
+  void _drawSkyline(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDay ? const Color(0xFF102736) : const Color(0xFF020712)).withOpacity(isDay ? .42 : .78);
+
+    final light = Paint()
+      ..color = (isDay ? Colors.white : kGold).withOpacity(isDay ? .16 : .28);
+
+    final heights = [42, 82, 54, 132, 66, 156, 92, 48, 118, 78, 56, 144, 72, 104];
+    final w = size.width / heights.length;
+
+    for (var i = 0; i < heights.length; i++) {
+      final h = heights[i].toDouble();
+      final rect = Rect.fromLTWH(i * w + 2, size.height - h, w - 5, h);
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(3)), paint);
+
+      if (i.isEven) {
+        canvas.drawCircle(Offset(rect.center.dx, rect.top + 18), 1.4, light);
+      }
+    }
+  }
+
+  void _drawVignette(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0, -0.12),
+        radius: 1.10,
+        colors: [
+          Colors.transparent,
+          Colors.black.withOpacity(isDay ? .18 : .42),
+          Colors.black.withOpacity(isDay ? .42 : .78),
+        ],
+        stops: const [.0, .62, 1],
+      ).createShader(Offset.zero & size);
+
+    canvas.drawRect(Offset.zero & size, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant StudioBackdropPainter oldDelegate) => oldDelegate.mode != mode;
+}
+
+class StudioTopBar extends StatelessWidget {
+  final VisualMode mode;
+  final VoidCallback onCall;
+  final VoidCallback onMode;
+
+  const StudioTopBar({
+    required this.mode,
+    required this.onCall,
+    required this.onMode,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 18,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          const StudioBrand(),
+          const Spacer(),
+          StudioIconButton(
+            icon: mode == VisualMode.night ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+            onTap: onMode,
+            gold: mode == VisualMode.day,
+          ),
+          const SizedBox(width: 8),
+          StudioActionButton(label: 'פתח קריאה', onTap: onCall),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioBrand extends StatelessWidget {
+  const StudioBrand({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: 'קו ', style: TextStyle(color: Color(0xFFEAF2F5))),
+          TextSpan(text: 'פתוח', style: TextStyle(color: kGreenSoft)),
+        ],
+      ),
+      style: TextStyle(
+        fontSize: 19,
+        fontWeight: FontWeight.w900,
+        letterSpacing: -.2,
+      ),
+    );
+  }
+}
+
+class StudioIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool gold;
+
+  const StudioIconButton({
+    required this.icon,
+    required this.onTap,
+    this.gold = false,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = gold ? kGold : kGreenSoft;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.035),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: c.withOpacity(.28)),
+          boxShadow: [
+            BoxShadow(color: c.withOpacity(.08), blurRadius: 18),
+          ],
+        ),
+        child: Icon(icon, color: c, size: 18),
+      ),
+    );
+  }
+}
+
+class StudioScene extends StatelessWidget {
+  final int selected;
+  final VisualMode mode;
+
+  const StudioScene({
+    required this.selected,
+    required this.mode,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final spec = switch (selected) {
+      0 => const StudioSpec(
+          eyebrow: 'Command Center',
+          title: 'לוח בקרה',
+          subtitle: 'קריאות, נהגים, דיווחים ואמון בזמן אמת.',
+          icon: Icons.grid_view_rounded,
+        ),
+      1 => const StudioSpec(
+          eyebrow: 'נהג פעיל',
+          title: 'אני על הקו',
+          subtitle: 'קריאות באזור, הכנסה, אמון וזמינות.',
+          icon: Icons.local_taxi_rounded,
+        ),
+      2 => const StudioSpec(
+          eyebrow: 'מרחב נהגים',
+          title: 'אזור חי',
+          subtitle: 'אזורי פעילות, נהגים זמינים וקריאות חדשות.',
+          icon: Icons.hub_rounded,
+        ),
+      3 => const StudioSpec(
+          eyebrow: 'לקוח',
+          title: 'לאן נוסעים?',
+          subtitle: 'פתיחת קריאה מהירה, ברורה ומאומתת.',
+          icon: Icons.person_rounded,
+        ),
+      _ => const StudioSpec(
+          eyebrow: 'בטוח ומאומת',
+          title: 'שכבת אמון',
+          subtitle: 'אימות נהגים, דירוגים, מסמכים ושירות אנושי.',
+          icon: Icons.verified_user_rounded,
+        ),
+    };
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2, bottom: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StudioHero(spec: spec),
+                const SizedBox(height: 10),
+                StudioPanel(
+                  radius: 22,
+                  padding: const EdgeInsets.all(14),
+                  child: _contentFor(selected),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _contentFor(int selected) {
+    return switch (selected) {
+      0 => const StudioAdminContent(),
+      1 => const StudioDriverContent(),
+      2 => const StudioZoneContent(),
+      3 => const StudioCustomerContent(),
+      _ => const StudioTrustContent(),
+    };
+  }
+}
+
+class StudioSpec {
+  final String eyebrow;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const StudioSpec({
+    required this.eyebrow,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+}
+
+class StudioHero extends StatelessWidget {
+  final StudioSpec spec;
+
+  const StudioHero({required this.spec, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 20,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: kGreen.withOpacity(.10),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: kGreenSoft.withOpacity(.22)),
+            ),
+            child: Icon(spec.icon, color: kGreenSoft, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  spec.eyebrow,
+                  style: const TextStyle(
+                    color: kGreenSoft,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  spec.title,
+                  style: const TextStyle(
+                    color: Color(0xFFF2F6F8),
+                    fontSize: 24,
+                    height: 1.05,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -.3,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  spec.subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFFAEB8C3),
+                    fontSize: 13,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioCustomerContent extends StatelessWidget {
+  const StudioCustomerContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        StudioField(icon: Icons.my_location_rounded, label: 'מאיפה אוספים אותך?'),
+        SizedBox(height: 8),
+        StudioField(icon: Icons.location_on_rounded, label: 'יעד הנסיעה'),
+        SizedBox(height: 10),
+        StudioSegment(),
+        SizedBox(height: 12),
+        SizedBox(height: 178, child: StudioRouteMap()),
+        SizedBox(height: 12),
+        StudioActionButton(label: 'פתח קריאה', full: true),
+        SizedBox(height: 10),
+        StudioTrustLine(),
+      ],
+    );
+  }
+}
+
+class StudioDriverContent extends StatelessWidget {
+  const StudioDriverContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        StudioLiveSwitch(),
+        SizedBox(height: 12),
+        SizedBox(height: 190, child: StudioRouteMap(driverMode: true)),
+        SizedBox(height: 12),
+        StudioStatsRow(items: [
+          StudioMetric('₪740', 'היום', Icons.payments_rounded, kGreenSoft),
+          StudioMetric('98%', 'אמון', Icons.verified_user_rounded, kGold),
+          StudioMetric('12', 'קריאות', Icons.radio_button_checked_rounded, kGreenSoft),
+        ]),
+        SizedBox(height: 10),
+        StudioCallRow(title: 'קריאה קרובה', meta: 'בני ברק · 4 דק׳', value: '₪68'),
+        SizedBox(height: 8),
+        StudioCallRow(title: 'קריאה משתלמת', meta: 'רמת גן · 9 דק׳', value: '₪240'),
+      ],
+    );
+  }
+}
+
+class StudioZoneContent extends StatelessWidget {
+  const StudioZoneContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        SizedBox(height: 236, child: StudioZoneMap()),
+        SizedBox(height: 12),
+        StudioStatsRow(items: [
+          StudioMetric('86', 'נהגים', Icons.local_taxi_rounded, kGreenSoft),
+          StudioMetric('24', 'קריאות', Icons.radio_button_checked_rounded, kGreenSoft),
+          StudioMetric('חם', 'אזור', Icons.local_fire_department_rounded, kGold),
+        ]),
+        SizedBox(height: 10),
+        StudioCallRow(title: 'קריאה חדשה', meta: 'בני ברק · 4 דק׳', value: 'פתוחה'),
+      ],
+    );
+  }
+}
+
+class StudioAdminContent extends StatelessWidget {
+  const StudioAdminContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        StudioStatsRow(items: [
+          StudioMetric('248', 'קריאות', Icons.radio_button_checked_rounded, kGreenSoft),
+          StudioMetric('1,458', 'נהגים', Icons.local_taxi_rounded, kGreenSoft),
+          StudioMetric('98%', 'אמון', Icons.verified_user_rounded, kGold),
+        ]),
+        SizedBox(height: 12),
+        SizedBox(height: 168, child: StudioAdminChart()),
+        SizedBox(height: 10),
+        StudioCallRow(title: 'נהג לאישור', meta: 'רפי כהן', value: 'בדיקה'),
+        SizedBox(height: 8),
+        StudioCallRow(title: 'דיווח לבדיקה', meta: 'נסיעה חריגה', value: 'פתוח'),
+      ],
+    );
+  }
+}
+
+class StudioTrustContent extends StatelessWidget {
+  const StudioTrustContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        StudioTrustSeal(),
+        SizedBox(height: 12),
+        StudioStatsRow(items: [
+          StudioMetric('98%', 'מדד אמון', Icons.verified_user_rounded, kGold),
+          StudioMetric('+247', 'נסיעות', Icons.local_taxi_rounded, kGreenSoft),
+          StudioMetric('4.9', 'דירוג', Icons.star_rounded, kGold),
+        ]),
+        SizedBox(height: 10),
+        StudioCallRow(title: 'מסמכים נבדקו', meta: 'רישיון · ביטוח · תוקף', value: 'מאומת'),
+        SizedBox(height: 8),
+        StudioCallRow(title: 'שירות אנושי', meta: 'זמין לקריאות חריגות', value: 'פעיל'),
+      ],
+    );
+  }
+}
+
+class StudioPanel extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double radius;
+
+  const StudioPanel({
+    required this.child,
+    this.padding = EdgeInsets.zero,
+    this.radius = 18,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xE60A1520),
+            Color(0xD9030911),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: Colors.white.withOpacity(.095), width: 1),
+        boxShadow: [
+          const BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 26,
+            offset: Offset(0, 14),
+          ),
+          BoxShadow(
+            color: kGreen.withOpacity(.055),
+            blurRadius: 34,
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class StudioActionButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onTap;
+  final bool full;
+
+  const StudioActionButton({
+    required this.label,
+    this.onTap,
+    this.full = false,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final button = GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF1BE08F),
+              Color(0xFF67F2BC),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(color: kGreen.withOpacity(.22), blurRadius: 22, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF03120B),
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ),
+    );
+
+    return full ? SizedBox(width: double.infinity, child: button) : button;
+  }
+}
+
+class StudioField extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const StudioField({
+    required this.icon,
+    required this.label,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 14,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: kGreenSoft, size: 18),
+          const SizedBox(width: 9),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFFEAF2F5),
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioSegment extends StatelessWidget {
+  const StudioSegment({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: StudioSegmentItem(label: 'עכשיו', active: true)),
+        SizedBox(width: 8),
+        Expanded(child: StudioSegmentItem(label: 'מאוחר יותר', active: false)),
+      ],
+    );
+  }
+}
+
+class StudioSegmentItem extends StatelessWidget {
+  final String label;
+  final bool active;
+
+  const StudioSegmentItem({
+    required this.label,
+    required this.active,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 42,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: active ? kGreen.withOpacity(.13) : Colors.black.withOpacity(.16),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: active ? kGreenSoft.withOpacity(.55) : Colors.white.withOpacity(.08)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? Colors.white : const Color(0xFF9CA8B3),
+          fontSize: 14,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class StudioLiveSwitch extends StatelessWidget {
+  const StudioLiveSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF19D98B), Color(0xFF6EF2BD)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(color: kGreen.withOpacity(.22), blurRadius: 24, offset: const Offset(0, 8)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0xFF03120B).withOpacity(.90),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.sensors_rounded, color: Colors.white, size: 18),
+          ),
+          const SizedBox(width: 10),
+          const Text(
+            'אני על הקו',
+            style: TextStyle(
+              color: Color(0xFF03120B),
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioStatsRow extends StatelessWidget {
+  final List<StudioMetric> items;
+
+  const StudioStatsRow({required this.items, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          Expanded(child: StudioMetricTile(item: items[i])),
+          if (i < items.length - 1) const SizedBox(width: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class StudioMetric {
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color accent;
+
+  const StudioMetric(this.value, this.label, this.icon, this.accent);
+}
+
+class StudioMetricTile extends StatelessWidget {
+  final StudioMetric item;
+
+  const StudioMetricTile({required this.item, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 14,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          Icon(item.icon, color: item.accent, size: 17),
+          const SizedBox(height: 5),
+          Text(
+            item.value,
+            style: TextStyle(
+              color: item.accent,
+              fontSize: 18,
+              height: 1,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            item.label,
+            style: const TextStyle(
+              color: Color(0xFF9CA8B3),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioCallRow extends StatelessWidget {
+  final String title;
+  final String meta;
+  final String value;
+
+  const StudioCallRow({
+    required this.title,
+    required this.meta,
+    required this.value,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 14,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.radio_button_checked_rounded, color: kGreenSoft, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 2),
+                Text(meta, style: const TextStyle(fontSize: 11, color: Color(0xFF93A0AD), fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: kGold,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioTrustLine extends StatelessWidget {
+  const StudioTrustLine({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.verified_user_rounded, color: kGold, size: 16),
+        SizedBox(width: 6),
+        Text(
+          'נהגים נבחרים · ביטוח מלא · דירוגים אמיתיים',
+          style: TextStyle(
+            color: Color(0xFFAEB8C3),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class StudioTrustSeal extends StatelessWidget {
+  const StudioTrustSeal({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 18,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            width: 82,
+            height: 82,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: kGold.withOpacity(.075),
+              border: Border.all(color: kGold.withOpacity(.38)),
+              boxShadow: [
+                BoxShadow(color: kGold.withOpacity(.12), blurRadius: 34),
+              ],
+            ),
+            child: const Icon(Icons.verified_user_rounded, color: kGold, size: 38),
+          ),
+          const SizedBox(height: 10),
+          const Text('מדד אמון 98%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 4),
+          const Text(
+            'אימות, מסמכים, דירוג ושירות אנושי.',
+            style: TextStyle(color: Color(0xFFAEB8C3), fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudioRouteMap extends StatelessWidget {
+  final bool driverMode;
+
+  const StudioRouteMap({this.driverMode = false, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: CustomPaint(
+        painter: StudioMapPainter(driverMode: driverMode),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class StudioMapPainter extends CustomPainter {
+  final bool driverMode;
+
+  const StudioMapPainter({required this.driverMode});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _base(canvas, size);
+    _roads(canvas, size);
+    _route(canvas, size);
+    _pin(canvas, size, Offset(.18, .62), kGreenSoft);
+    _pin(canvas, size, Offset(.78, .30), kGreenSoft);
+    _pin(canvas, size, Offset(.52, .52), driverMode ? kGold : kGreenSoft);
+    _label(canvas, 'קריאה פתוחה', Offset(size.width * .56, size.height * .20), kGreenSoft);
+    _label(canvas, '4 דק׳', Offset(size.width * .47, size.height * .56), Colors.white);
+  }
+
+  void _base(Canvas canvas, Size size) {
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFF03101A), Color(0xFF071B1F), Color(0xFF030811)],
+        ).createShader(Offset.zero & size),
+    );
+
+    final glow = Paint()
+      ..shader = RadialGradient(
+        colors: [kGreen.withOpacity(.18), Colors.transparent],
+      ).createShader(Rect.fromCircle(center: Offset(size.width * .54, size.height * .52), radius: size.width * .45));
+
+    canvas.drawCircle(Offset(size.width * .54, size.height * .52), size.width * .45, glow);
+  }
+
+  void _roads(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(.055)
+      ..strokeWidth = .8;
+
+    for (double x = 0; x < size.width; x += 34) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += 34) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+
+    final road = Paint()
+      ..color = kGreenSoft.withOpacity(.10)
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+
+    for (var i = 0; i < 5; i++) {
+      final y = size.height * (.20 + i * .15);
+      final path = Path()
+        ..moveTo(size.width * .08, y)
+        ..quadraticBezierTo(size.width * .44, y + 26, size.width * .92, y - 10);
+      canvas.drawPath(path, road);
+    }
+  }
+
+  void _route(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width * .16, size.height * .70)
+      ..cubicTo(size.width * .36, size.height * .57, size.width * .56, size.height * .38, size.width * .82, size.height * .28);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = kGreen.withOpacity(.16)
+        ..strokeWidth = 14
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16),
+    );
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = kGreenSoft.withOpacity(.74)
+        ..strokeWidth = 3
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  void _pin(Canvas canvas, Size size, Offset unit, Color color) {
+    final p = Offset(size.width * unit.dx, size.height * unit.dy);
+    canvas.drawCircle(
+      p,
+      18,
+      Paint()
+        ..color = color.withOpacity(.16)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16),
+    );
+    canvas.drawCircle(p, 6, Paint()..color = color);
+  }
+
+  void _label(Canvas canvas, String text, Offset pos, Color color) {
+    final tp = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(
+        text: text,
+        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w900),
+      ),
+    )..layout();
+
+    final r = Rect.fromLTWH(pos.dx - tp.width - 14, pos.dy - 13, tp.width + 28, 26);
+    canvas.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(10)), Paint()..color = Colors.black.withOpacity(.70));
+    tp.paint(canvas, Offset(r.left + 14, r.top + 7));
+  }
+
+  @override
+  bool shouldRepaint(covariant StudioMapPainter oldDelegate) => oldDelegate.driverMode != driverMode;
+}
+
+class StudioZoneMap extends StatelessWidget {
+  const StudioZoneMap({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: CustomPaint(
+        painter: StudioZonePainter(),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class StudioZonePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF03101A));
+
+    final grid = Paint()
+      ..color = Colors.white.withOpacity(.05)
+      ..strokeWidth = .8;
+
+    for (double x = 0; x < size.width; x += 34) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
+    }
+    for (double y = 0; y < size.height; y += 34) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+    }
+
+    final zone = Path()
+      ..moveTo(size.width * .20, size.height * .25)
+      ..quadraticBezierTo(size.width * .58, size.height * .05, size.width * .82, size.height * .36)
+      ..quadraticBezierTo(size.width * .74, size.height * .78, size.width * .28, size.height * .82)
+      ..quadraticBezierTo(size.width * .08, size.height * .56, size.width * .20, size.height * .25);
+
+    canvas.drawPath(zone, Paint()..color = kGreen.withOpacity(.08));
+    canvas.drawPath(
+      zone,
+      Paint()
+        ..color = kGreenSoft.withOpacity(.46)
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke,
+    );
+
+    _dot(canvas, size, Offset(.28, .36), 'אבי', kGreenSoft);
+    _dot(canvas, size, Offset(.64, .30), 'רפי', kGreenSoft);
+    _dot(canvas, size, Offset(.73, .62), 'משה', kGreenSoft);
+    _dot(canvas, size, Offset(.42, .74), 'יוסי', kGreenSoft);
+    _dot(canvas, size, Offset(.50, .50), 'קריאה', kGold);
+  }
+
+  void _dot(Canvas canvas, Size size, Offset unit, String label, Color color) {
+    final p = Offset(size.width * unit.dx, size.height * unit.dy);
+    canvas.drawCircle(p, 16, Paint()..color = color.withOpacity(.12));
+    canvas.drawCircle(p, 6, Paint()..color = color);
+
+    final tp = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(text: label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900)),
+    )..layout();
+
+    tp.paint(canvas, p.translate(10, -18));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class StudioAdminChart extends StatelessWidget {
+  const StudioAdminChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: CustomPaint(
+        painter: StudioAdminChartPainter(),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class StudioAdminChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF03101A));
+
+    final bars = [.40, .56, .46, .72, .62, .82, .66, .90];
+    final bw = size.width / 18;
+
+    for (var i = 0; i < bars.length; i++) {
+      final h = size.height * bars[i] * .64;
+      final x = size.width * .12 + i * bw * 1.75;
+      final y = size.height - h - 22;
+      final rect = RRect.fromRectAndRadius(Rect.fromLTWH(x, y, bw, h), const Radius.circular(8));
+      canvas.drawRRect(rect, Paint()..color = kGreenSoft.withOpacity(.70));
+    }
+
+    final tp = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: const TextSpan(
+        text: 'פעילות היום',
+        style: TextStyle(color: kGreenSoft, fontSize: 12, fontWeight: FontWeight.w900),
+      ),
+    )..layout();
+
+    tp.paint(canvas, Offset(size.width - tp.width - 14, 12));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class StudioBottomNav extends StatelessWidget {
+  final List<AppTab> tabs;
+  final int selected;
+  final ValueChanged<int> onSelect;
+
+  const StudioBottomNav({
+    required this.tabs,
+    required this.selected,
+    required this.onSelect,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StudioPanel(
+      radius: 18,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      child: Row(
+        children: List.generate(tabs.length, (i) {
+          final active = i == selected;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onSelect(i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                height: 46,
+                decoration: BoxDecoration(
+                  color: active ? kGreen : Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      tabs[i].icon,
+                      color: active ? const Color(0xFF03120B) : const Color(0xFFAEB8C3),
+                      size: 18,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      tabs[i].label,
+                      style: TextStyle(
+                        color: active ? const Color(0xFF03120B) : const Color(0xFFAEB8C3),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ],
