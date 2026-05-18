@@ -57,6 +57,7 @@ Image premiumAssetImage(
 // USE_CASE_PASS_01_CUSTOMER: customer tab is a clear ride request workflow.
 // USE_CASE_PASS_02_DRIVER: driver tab is a clear live work console.
 // USE_CASE_PASS_03_ZONE: zone tab is a clear live operations surface.
+// USE_CASE_PASS_04_ADMIN: admin tab is a clear operations control surface.
 
 
 
@@ -438,6 +439,7 @@ enum PhoneMode { home, customer, driver, admin, trust }
 
 
 
+
 class AdminCommandScene extends StatelessWidget {
   const AdminCommandScene({super.key});
 
@@ -450,47 +452,14 @@ class AdminCommandScene extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 960),
+          constraints: const BoxConstraints(maxWidth: 920),
           child: Padding(
-            padding: EdgeInsets.only(
-              top: compact ? 8 : 30,
-              bottom: 12,
-            ),
+            padding: EdgeInsets.only(top: compact ? 6 : 24, bottom: 10),
             child: Column(
-              children: [
-                const GlassLabel('Command Center'),
-                const SizedBox(height: 12),
-                Text(
-                  'לוח בקרה',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: compact ? 32 : 42,
-                    height: 1.08,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.6,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GlassPanel(
-                  radius: 22,
-                  child: Padding(
-                    padding: EdgeInsets.all(compact ? 14 : 18),
-                    child: Column(
-                      children: const [
-                        AdminMetricsGrid(),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          height: 200,
-                          child: AdminActivityChart(),
-                        ),
-                        SizedBox(height: 16),
-                        AdminActivityPanel(),
-                        SizedBox(height: 16),
-                        AdminApprovalsPanel(),
-                      ],
-                    ),
-                  ),
-                ),
+              children: const [
+                AdminActionHeader(),
+                SizedBox(height: 12),
+                AdminControlPanel(),
               ],
             ),
           ),
@@ -499,6 +468,351 @@ class AdminCommandScene extends StatelessWidget {
     );
   }
 }
+
+class AdminActionHeader extends StatelessWidget {
+  const AdminActionHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 20,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: kGreen.withOpacity(.10),
+                border: Border.all(color: kGreenSoft.withOpacity(.30)),
+              ),
+              child: const Icon(Icons.dashboard_rounded, color: kGreenSoft, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'לוח שליטה',
+                    style: TextStyle(fontSize: 22, height: 1.05, fontWeight: FontWeight.w900),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'קריאות, נהגים, חריגות ואישורים בזמן אמת.',
+                    style: TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AdminHealthPill(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AdminHealthPill extends StatelessWidget {
+  const AdminHealthPill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: kGreen.withOpacity(.12),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: kGreenSoft.withOpacity(.35)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check_circle_rounded, color: kGreenSoft, size: 14),
+          SizedBox(width: 5),
+          Text(
+            'תקין',
+            style: TextStyle(color: kGreenSoft, fontSize: 12, fontWeight: FontWeight.w900),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AdminControlPanel extends StatelessWidget {
+  const AdminControlPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 22,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: const [
+            AdminOpsMetrics(),
+            SizedBox(height: 12),
+            AdminOpsChart(),
+            SizedBox(height: 12),
+            AdminAlertCard(),
+            SizedBox(height: 10),
+            AdminOpsRow(
+              icon: Icons.person_add_alt_1_rounded,
+              title: 'נהג לאישור',
+              meta: 'רפי כהן · מסמכים ממתינים',
+              value: 'אשר',
+              accent: kGreenSoft,
+            ),
+            SizedBox(height: 8),
+            AdminOpsRow(
+              icon: Icons.report_rounded,
+              title: 'דיווח חריג',
+              meta: 'נסיעה חורגת ממדד אמון',
+              value: 'בדוק',
+              accent: kGold,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AdminOpsMetrics extends StatelessWidget {
+  const AdminOpsMetrics({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: AdminOpsMetric(icon: Icons.radio_button_checked_rounded, label: 'קריאות', value: '248', accent: kGreenSoft)),
+        SizedBox(width: 8),
+        Expanded(child: AdminOpsMetric(icon: Icons.local_taxi_rounded, label: 'נהגים', value: '1,458', accent: kGreenSoft)),
+        SizedBox(width: 8),
+        Expanded(child: AdminOpsMetric(icon: Icons.verified_user_rounded, label: 'אמון', value: '98%', accent: kGold)),
+      ],
+    );
+  }
+}
+
+class AdminOpsMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accent;
+
+  const AdminOpsMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 62,
+      radius: 14,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: accent, size: 17),
+          const SizedBox(height: 3),
+          Text(value, style: TextStyle(color: accent, fontSize: 14, fontWeight: FontWeight.w900, height: 1)),
+          const SizedBox(height: 3),
+          Text(label, style: const TextStyle(color: Color(0xFF8793A0), fontSize: 10, fontWeight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+}
+
+class AdminOpsChart extends StatelessWidget {
+  const AdminOpsChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 18,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: SizedBox(
+          height: 164,
+          child: CustomPaint(
+            painter: AdminOpsChartPainter(),
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AdminOpsChartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final grid = Paint()
+      ..color = Colors.white.withOpacity(.025)
+      ..strokeWidth = 1;
+
+    for (double y = 22; y < size.height; y += 34) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+    }
+
+    final bars = [.42, .60, .48, .78, .64, .86, .68, .92];
+    final w = size.width / 15;
+
+    for (var i = 0; i < bars.length; i++) {
+      final h = size.height * bars[i] * .62;
+      final x = size.width * .08 + i * w * 1.55;
+      final y = size.height - h - 10;
+
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, y, w, h),
+        const Radius.circular(8),
+      );
+
+      canvas.drawRRect(
+        rect,
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [kGreenSoft, kGreen],
+          ).createShader(rect.outerRect),
+      );
+    }
+
+    _label(canvas, 'פעילות היום', Offset(size.width - 12, 10), kGreenSoft, right: true);
+    _label(canvas, 'Live Ops', const Offset(10, 10), kGold);
+  }
+
+  void _label(Canvas canvas, String value, Offset offset, Color color, {bool right = false}) {
+    final tp = TextPainter(
+      textDirection: TextDirection.rtl,
+      text: TextSpan(
+        text: value,
+        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w900),
+      ),
+    )..layout();
+
+    tp.paint(canvas, Offset(right ? offset.dx - tp.width : offset.dx, offset.dy));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class AdminAlertCard extends StatelessWidget {
+  const AdminAlertCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      radius: 16,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+        child: Row(
+          children: [
+            const Icon(Icons.priority_high_rounded, color: kGold, size: 18),
+            const SizedBox(width: 9),
+            const Expanded(
+              child: Text(
+                '3 חריגות דורשות בדיקה לפני אישור אוטומטי',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+              ),
+            ),
+            Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: kGold.withOpacity(.11),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: kGold.withOpacity(.30)),
+              ),
+              child: const Text(
+                'פתח',
+                style: TextStyle(color: kGold, fontSize: 11, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AdminOpsRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String meta;
+  final String value;
+  final Color accent;
+
+  const AdminOpsRow({
+    required this.icon,
+    required this.title,
+    required this.meta,
+    required this.value,
+    required this.accent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassPanel(
+      height: 52,
+      radius: 15,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: accent, size: 17),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 2),
+                  Text(meta, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF8793A0), fontSize: 10.5, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+            Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: accent.withOpacity(.11),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: accent.withOpacity(.28)),
+              ),
+              child: Text(
+                value,
+                style: TextStyle(color: accent, fontSize: 11, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 class AdminMetricsGrid extends StatelessWidget {
   const AdminMetricsGrid({super.key});
