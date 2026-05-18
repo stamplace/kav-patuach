@@ -5,13 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 const kBg = Color(0xFF02070F);
 const kPanel = Color(0xFF071523);
 const kPhone = Color(0xFF07111F);
-const kGreen = Color(0xFF12E391);
-const kGreenSoft = Color(0xFF62F2B6);
-const kGold = Color(0xFFF6C66D);
+const kGreen = Color(0xFF23C984);
+const kGreenSoft = Color(0xFF73E6B4);
+const kGold = Color(0xFFE7B85B);
 
 enum VisualMode { night, day }
 
 // OVERLAY_TUNING_PASS_01: premium image assets are the visual base; UI must stay thin and readable.
+// VISUAL_COMPOSITION_PASS_02: assets lead, old painters are reduced, trust poster has priority.
 
 
 
@@ -49,10 +50,10 @@ class PremiumAssetBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDay = mode == VisualMode.day;
 
-    final asset = isDay
-        ? 'assets/brand/kav-day-city.webp'
-        : scene == 4
-            ? 'assets/brand/kav-hero-poster-night.webp'
+    final asset = scene == 4
+        ? 'assets/brand/kav-hero-poster-night.webp'
+        : isDay
+            ? 'assets/brand/kav-day-city.webp'
             : 'assets/brand/kav-night-city.webp';
 
     return Stack(
@@ -94,14 +95,14 @@ class PremiumAssetBackground extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: isDay
                     ? [
-                        Colors.white.withOpacity(.10),
+                        Colors.white.withOpacity(.045),
                         Colors.transparent,
                         const Color(0xFF020711).withOpacity(.30),
                       ]
                     : [
                         const Color(0xFF020611).withOpacity(.10),
                         Colors.transparent,
-                        Colors.black.withOpacity(.48),
+                        Colors.black.withOpacity(.38),
                       ],
               ),
             ),
@@ -116,7 +117,7 @@ class PremiumAssetBackground extends StatelessWidget {
                 center: const Alignment(0, .85),
                 radius: .95,
                 colors: [
-                  Colors.black.withOpacity(isDay ? .22 : .46),
+                  Colors.black.withOpacity(isDay ? .16 : .34),
                   Colors.transparent,
                 ],
               ),
@@ -162,7 +163,7 @@ class PremiumMapSurface extends StatelessWidget {
         Positioned.fill(
           child: Container(
             color: isDay
-                ? Colors.white.withOpacity(.035)
+                ? Colors.white.withOpacity(.018)
                 : const Color(0xFF020711).withOpacity(.10),
           ),
         ),
@@ -184,7 +185,7 @@ class PremiumMapSurface extends StatelessWidget {
 
         // Old code-drawn map layer is now only signal/UI hints, not the map itself.
         Opacity(
-          opacity: .16,
+          opacity: .035,
           child: child,
         ),
       ],
@@ -267,7 +268,7 @@ class _AppHomeState extends State<AppHome> {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 280),
                         child: AppStage(
-                          key: ValueKey(selected),
+                          key: ValueKey('$selected-${visualMode.name}'),
                           selected: selected,
                         ),
                       ),
@@ -548,7 +549,7 @@ class AdminChartPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, bg);
 
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.022)
+      ..color = Colors.white.withOpacity(.010)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 42) {
@@ -801,7 +802,7 @@ class ZoneMapPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, bg);
 
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.025)
+      ..color = Colors.white.withOpacity(.012)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 36) {
@@ -828,14 +829,14 @@ class ZoneMapPainter extends CustomPainter {
     canvas.drawPath(
       zonePath,
       Paint()
-        ..color = kGreenSoft.withOpacity(.32)
+        ..color = kGreenSoft.withOpacity(.18)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
     );
 
     final route = Paint()
-      ..color = kGreen.withOpacity(.28)
+      ..color = kGreen.withOpacity(.09)
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
 
@@ -1091,7 +1092,7 @@ class TrustSealLarge extends StatelessWidget {
         border: Border.all(color: kGold.withOpacity(.55), width: 2),
         boxShadow: [
           BoxShadow(color: kGold.withOpacity(.22), blurRadius: 70),
-          BoxShadow(color: kGreen.withOpacity(.16), blurRadius: 90),
+          BoxShadow(color: kGreen.withOpacity(.09), blurRadius: 90),
         ],
       ),
       child: const Icon(Icons.verified_user_rounded, color: kGold, size: 52),
@@ -1364,7 +1365,7 @@ class OfferStatusHeart extends StatelessWidget {
             color: kGreen.withOpacity(.10),
             border: Border.all(color: kGreenSoft.withOpacity(.45)),
             boxShadow: [
-              BoxShadow(color: kGreen.withOpacity(.28), blurRadius: 48),
+              BoxShadow(color: kGreen.withOpacity(.09), blurRadius: 48),
             ],
           ),
           child: const Icon(Icons.favorite_rounded, color: kGreenSoft, size: 38),
@@ -1685,7 +1686,7 @@ class DriverLiveCallCard extends StatelessWidget {
                 color: kGreen.withOpacity(.14),
                 border: Border.all(color: kGreenSoft.withOpacity(.55)),
                 boxShadow: [
-                  BoxShadow(color: kGreen.withOpacity(.18), blurRadius: 24),
+                  BoxShadow(color: kGreen.withOpacity(.10), blurRadius: 24),
                 ],
               ),
               child: const Icon(Icons.local_taxi_rounded, color: kGreen),
@@ -2487,7 +2488,7 @@ class LiveMapPainter extends CustomPainter {
 
   void _drawMapTexture(Canvas canvas, Size size) {
     final grid = Paint()
-      ..color = Colors.white.withOpacity(.022)
+      ..color = Colors.white.withOpacity(.010)
       ..strokeWidth = 1;
 
     for (double x = 0; x < size.width; x += 34) {
@@ -2739,7 +2740,7 @@ class SegmentButton extends StatelessWidget {
       height: 48,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active ? kGreen.withOpacity(.18) : Colors.black.withOpacity(.28),
+        color: active ? kGreen.withOpacity(.10) : Colors.black.withOpacity(.28),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: active ? kGreenSoft : Colors.white.withOpacity(.1)),
       ),
@@ -2903,12 +2904,12 @@ class GlassPanel extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            const Color(0xFF07111D).withOpacity(.66),
-            const Color(0xFF020711).withOpacity(.58),
+            const Color(0xFF07111D).withOpacity(.88),
+            const Color(0xFF020711).withOpacity(.82),
           ],
         ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.085), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(.105), width: 1),
         boxShadow: [
           const BoxShadow(color: Colors.black45, blurRadius: 16, offset: Offset(0, 9)),
           BoxShadow(color: kGreen.withOpacity(.028), blurRadius: 22),
@@ -2937,7 +2938,7 @@ class NeonButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(colors: [Color(0xFF13C783), Color(0xFF5EEAB0)]),
-        boxShadow: [BoxShadow(color: kGreen.withOpacity(.18), blurRadius: 20, offset: Offset(0, 7))],
+        boxShadow: [BoxShadow(color: kGreen.withOpacity(.10), blurRadius: 20, offset: Offset(0, 7))],
       ),
       alignment: Alignment.center,
       child: Text(
@@ -3178,7 +3179,7 @@ class StudioBackdropPainter extends CustomPainter {
 
     canvas.drawRect(Offset.zero & size, base);
 
-    _radial(canvas, size, Offset(.50, .10), isDay ? kGreen.withOpacity(.18) : kGreen.withOpacity(.28), size.width * .82);
+    _radial(canvas, size, Offset(.50, .10), isDay ? kGreen.withOpacity(.10) : kGreen.withOpacity(.09), size.width * .82);
     _radial(canvas, size, Offset(.10, .58), const Color(0xFF38BDF8).withOpacity(isDay ? .08 : .13), size.width * .68);
     _radial(canvas, size, Offset(.86, .40), kGold.withOpacity(isDay ? .08 : .10), size.width * .48);
 
@@ -3366,7 +3367,7 @@ class StudioIconButton extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.035),
+          color: Colors.white.withOpacity(.018),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: c.withOpacity(.28)),
           boxShadow: [
@@ -3675,12 +3676,12 @@ class StudioPanel extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            const Color(0xFF0A1520).withOpacity(.66),
-            const Color(0xFF030911).withOpacity(.58),
+            const Color(0xFF0A1520).withOpacity(.86),
+            const Color(0xFF030911).withOpacity(.78),
           ],
         ),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(.075), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(.105), width: 1),
         boxShadow: [
           const BoxShadow(
             color: Color(0x99000000),
@@ -4085,7 +4086,7 @@ class StudioMapPainter extends CustomPainter {
 
     final glow = Paint()
       ..shader = RadialGradient(
-        colors: [kGreen.withOpacity(.18), Colors.transparent],
+        colors: [kGreen.withOpacity(.10), Colors.transparent],
       ).createShader(Rect.fromCircle(center: Offset(size.width * .54, size.height * .52), radius: size.width * .45));
 
     canvas.drawCircle(Offset(size.width * .54, size.height * .52), size.width * .45, glow);
@@ -4093,7 +4094,7 @@ class StudioMapPainter extends CustomPainter {
 
   void _roads(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(.022)
+      ..color = Colors.white.withOpacity(.010)
       ..strokeWidth = .8;
 
     for (double x = 0; x < size.width; x += 34) {
@@ -4125,7 +4126,7 @@ class StudioMapPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = kGreen.withOpacity(.16)
+        ..color = kGreen.withOpacity(.09)
         ..strokeWidth = 14
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
