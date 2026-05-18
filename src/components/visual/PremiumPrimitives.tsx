@@ -7,7 +7,7 @@ type BaseProps = {
 
 export function GlowCard({ children, className = "" }: BaseProps) {
   return (
-    <div className={`rounded-[2rem] border border-white/10 bg-white/[0.055] p-5 shadow-2xl shadow-black/25 backdrop-blur-xl ${className}`}>
+    <div className={`rounded-[1.8rem] border border-white/10 bg-[#0a1724]/72 p-5 shadow-[0_24px_70px_rgba(0,0,0,.32)] backdrop-blur-2xl ${className}`}>
       {children}
     </div>
   );
@@ -15,13 +15,13 @@ export function GlowCard({ children, className = "" }: BaseProps) {
 
 export function StatusPill({ children, tone = "emerald" }: BaseProps & { tone?: "emerald" | "amber" | "blue" }) {
   const tones = {
-    emerald: "border-emerald-300/25 bg-emerald-300/10 text-emerald-200",
-    amber: "border-amber-300/25 bg-amber-300/10 text-amber-200",
-    blue: "border-sky-300/25 bg-sky-300/10 text-sky-200",
+    emerald: "border-emerald-300/25 bg-emerald-300/12 text-emerald-100 shadow-[0_0_24px_rgba(16,185,129,.12)]",
+    amber: "border-amber-300/25 bg-amber-300/12 text-amber-100 shadow-[0_0_24px_rgba(251,191,36,.10)]",
+    blue: "border-sky-300/25 bg-sky-300/12 text-sky-100 shadow-[0_0_24px_rgba(56,189,248,.10)]",
   };
 
   return (
-    <span className={`inline-flex rounded-full border px-4 py-2 text-sm font-black ${tones[tone]}`}>
+    <span className={`inline-flex rounded-full border px-4 py-2 text-xs font-black tracking-wide backdrop-blur-xl ${tones[tone]}`}>
       {children}
     </span>
   );
@@ -86,10 +86,11 @@ export function LiveMap({ className = "" }: { className?: string }) {
 
 export function PhoneFrame({ children }: BaseProps) {
   return (
-    <div className="relative mx-auto w-full max-w-[440px]">
-      <div className="absolute -inset-8 rounded-[4rem] bg-emerald-400/20 blur-3xl" />
-      <div className="relative rounded-[3rem] border border-white/15 bg-black p-3 shadow-[0_0_110px_rgba(16,185,129,.24)]">
-        <div className="rounded-[2.35rem] border border-white/10 bg-[#07111f] p-5">
+    <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[420px]">
+      <div className="absolute -inset-7 rounded-[4rem] bg-emerald-400/20 blur-3xl" />
+      <div className="relative rounded-[3rem] border border-white/20 bg-black p-2.5 shadow-[0_0_120px_rgba(16,185,129,.28),inset_0_0_22px_rgba(255,255,255,.08)]">
+        <div className="pointer-events-none absolute left-1/2 top-3 z-20 h-7 w-28 -translate-x-1/2 rounded-full bg-black shadow-[0_0_18px_rgba(0,0,0,.7)]" />
+        <div className="rounded-[2.45rem] border border-white/10 bg-[#07111f] p-4 pt-9 shadow-[inset_0_0_42px_rgba(15,23,42,.8)] sm:p-5 sm:pt-10">
           {children}
         </div>
       </div>
@@ -99,9 +100,9 @@ export function PhoneFrame({ children }: BaseProps) {
 
 export function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <GlowCard>
-      <p className="text-sm font-bold text-slate-300">{label}</p>
-      <p className="mt-3 text-4xl font-black text-emerald-300">{value}</p>
+    <GlowCard className="p-4 sm:p-5">
+      <p className="text-xs font-black text-slate-400">{label}</p>
+      <p className="mt-2 text-4xl font-black tracking-tight text-emerald-300">{value}</p>
     </GlowCard>
   );
 }

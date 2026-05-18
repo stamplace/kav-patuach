@@ -56,13 +56,13 @@ function PhoneTop() {
 export function HomeSurface() {
   return (
     <ProductShell active="home" badge="קו פתוח">
-      <section className="grid min-h-[76vh] gap-10 lg:grid-cols-[1fr_460px] lg:items-center">
+      <section className="grid min-h-[70vh] gap-8 lg:grid-cols-[1fr_460px] lg:items-center">
         <div>
           <StatusPill tone="emerald">Live Network</StatusPill>
-          <h1 className="mt-6 text-7xl font-black leading-[.9] tracking-tight sm:text-9xl">
+          <h1 className="mt-6 text-6xl font-black leading-[.9] tracking-tight sm:text-9xl">
             קו <span className="text-emerald-400">פתוח</span>
           </h1>
-          <p className="mt-7 max-w-2xl text-3xl font-black leading-tight">
+          <p className="mt-5 max-w-2xl text-3xl font-black leading-tight">
             קריאה. נהג. נסיעה.
           </p>
 
@@ -82,7 +82,7 @@ export function HomeSurface() {
 
         <PhoneFrame>
           <PhoneTop />
-          <LiveMap className="h-80" />
+          <LiveMap className="h-72 sm:h-80" />
           <div className="mt-5 grid grid-cols-[1fr_auto] gap-3">
             <GlowCard className="rounded-[1.6rem] p-4">
               <p className="text-sm font-bold text-slate-400">קריאה פעילה</p>
@@ -90,7 +90,7 @@ export function HomeSurface() {
             </GlowCard>
             <TrustBadge value="98%" />
           </div>
-          <a href="/customer" className="mt-5 block rounded-[1.7rem] bg-emerald-400 p-5 text-center text-3xl font-black text-[#03120b]">
+          <a href="/customer" className="mt-5 block rounded-[1.7rem] bg-emerald-400 p-5 text-center text-2xl font-black text-[#03120b] sm:text-3xl">
             פתח קריאה
           </a>
         </PhoneFrame>
@@ -105,16 +105,16 @@ export function CustomerSurface() {
       <section className="grid gap-8 lg:grid-cols-[460px_1fr] lg:items-start">
         <PhoneFrame>
           <PhoneTop />
-          <h1 className="text-center text-5xl font-black">לאן נוסעים?</h1>
+          <h1 className="text-center text-4xl font-black sm:text-5xl">לאן נוסעים?</h1>
 
-          <div className="mt-7 rounded-[2rem] border border-white/10 bg-white/[0.045] p-5">
+          <div className="mt-5 rounded-[2rem] border border-white/10 bg-white/[0.045] p-5">
             <div className="space-y-4">
               <AppField label="איסוף" value="המיקום הנוכחי" />
               <AppField label="יעד" value="לאן נוסעים?" />
               <SegmentControl />
             </div>
 
-            <LiveMap className="mt-5 h-56" />
+            <LiveMap className="mt-5 h-52 sm:h-56" />
             <div className="mt-5">
               <NeonButton>פתח קריאה</NeonButton>
             </div>
@@ -146,10 +146,10 @@ export function DriverSurface() {
       <section className="grid gap-8 lg:grid-cols-[430px_1fr] lg:items-start">
         <PhoneFrame>
           <PhoneTop />
-          <div className="mb-5 rounded-[1.7rem] bg-emerald-400 p-5 text-center text-3xl font-black text-[#03120b]">
+          <div className="mb-5 rounded-[1.7rem] bg-emerald-400 p-5 text-center text-2xl font-black text-[#03120b] sm:text-3xl">
             אני על הקו
           </div>
-          <LiveMap className="h-72" />
+          <LiveMap className="h-64 sm:h-72" />
           <div className="mt-5 grid grid-cols-2 gap-3">
             <MetricCard label="היום" value="₪740" />
             <MetricCard label="אמון" value="98%" />
