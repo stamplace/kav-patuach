@@ -61,6 +61,7 @@ Image premiumAssetImage(
 // USE_CASE_PASS_05_TRUST: trust tab is a clear assurance and verification surface.
 // TRUST_HEADER_CLEANUP_01: trust header does not repeat day/night state.
 // DEMO_ACTIVATION_PASS_01: default day mode and premium feedback for demo actions.
+// DEMO_ACTIVATION_PASS_02: customer demo has a live ride-request story state.
 
 
 
@@ -277,6 +278,7 @@ class AppHome extends StatefulWidget {
 class _AppHomeState extends State<AppHome> {
   int selected = 3;
   VisualMode visualMode = VisualMode.day;
+  DemoRideStep rideStep = DemoRideStep.idle;
   bool _didPrecacheAssets = false;
 
   @override
@@ -325,9 +327,13 @@ class _AppHomeState extends State<AppHome> {
                     Expanded(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 280),
-                        child: AppStage(
-                          key: ValueKey('$selected-${visualMode.name}'),
-                          selected: selected,
+                        child: DemoRideScope(
+                          step: rideStep,
+                          onStepChanged: (value) => setState(() => rideStep = value),
+                          child: AppStage(
+                            key: ValueKey('$selected-${visualMode.name}-$rideStep'),
+                            selected: selected,
+                          ),
                         ),
                       ),
                     ),
@@ -354,6 +360,72 @@ class AppTab {
   final IconData icon;
   const AppTab(this.label, this.icon);
 }
+
+
+enum DemoRideStep { idle, searching, offers, selected, enRoute }
+
+extension DemoRideStepText on DemoRideStep {
+  int get order => switch (this) {
+        DemoRideStep.idle => 0,
+        DemoRideStep.searching => 1,
+        DemoRideStep.offers => 2,
+        DemoRideStep.selected => 3,
+        DemoRideStep.enRoute => 4,
+      };
+
+  String get title => switch (this) {
+        DemoRideStep.idle => 'מוכן לפתיחה',
+        DemoRideStep.searching => 'מחפש נהגים',
+        DemoRideStep.offers => 'נמצאו 3 הצעות',
+        DemoRideStep.selected => 'נהג נבחר',
+        DemoRideStep.enRoute => 'הנהג בדרך',
+      };
+
+  String get cta => switch (this) {
+        DemoRideStep.idle => 'פתח קריאה',
+        DemoRideStep.searching => 'הצג הצעות',
+        DemoRideStep.offers => 'בחר נהג',
+        DemoRideStep.selected => 'התחל נסיעה',
+        DemoRideStep.enRoute => 'איפוס דמו',
+      };
+
+  DemoRideStep get next => switch (this) {
+        DemoRideStep.idle => DemoRideStep.searching,
+        DemoRideStep.searching => DemoRideStep.offers,
+        DemoRideStep.offers => DemoRideStep.selected,
+        DemoRideStep.selected => DemoRideStep.enRoute,
+        DemoRideStep.enRoute => DemoRideStep.idle,
+      };
+}
+
+class DemoRideScope extends InheritedWidget {
+  final DemoRideStep step;
+  final ValueChanged<DemoRideStep> onStepChanged;
+
+  const DemoRideScope({
+    required this.step,
+    required this.onStepChanged,
+    required super.child,
+    super.key,
+  });
+
+  static DemoRideScope of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<DemoRideScope>();
+    assert(scope != null, 'DemoRideScope not found');
+    return scope!;
+  }
+
+  @override
+  bool updateShouldNotify(DemoRideScope oldWidget) => oldWidget.step != step;
+}
+
+class DemoStepData {
+  final String label;
+  final IconData icon;
+
+  const DemoStepData(this.label, this.icon);
+}
+
 
 class AppStage extends StatelessWidget {
   final int selected;
@@ -2502,19 +2574,177 @@ class CustomerRequestPanel extends StatelessWidget {
             SegmentRow(),
             SizedBox(height: 12),
             CustomerRideSummary(),
+            SizedBox(height: 10),
+            DemoRideProgressStrip(),
             SizedBox(height: 12),
             SizedBox(
               height: 214,
               child: LiveMapCanvas(),
             ),
             SizedBox(height: 12),
-            NeonButton(label: 'פתח קריאה'),
+            DemoRidePrimaryButton(),
           ],
         ),
       ),
     );
   }
 }
+
+
+class DemoRideProgressStrip extends StatelessWidget {
+  const DemoRideProgressStrip({super.key});
+
+  static const items = [
+    DemoStepData('פתיחה', Icons.near_me_rounded),
+    DemoStepData('חיפוש', Icons.radar_rounded),
+    DemoStepData('הצעות', Icons.groups_rounded),
+    DemoStepData('נהג', Icons.verified_rounded),
+    DemoStepData('בדרך', Icons.local_taxi_rounded),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DemoRideScope.of(context);
+    final active = scope.step.order;
+
+    return GlassPanel(
+      height: 62,
+      radius: 16,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: [
+            for (var i = 0; i < items.length; i++)
+              Expanded(
+                child: DemoRideStepChip(
+                  data: items[i],
+                  active: i <= active,
+                  current: i == active,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DemoRideStepChip extends StatelessWidget {
+  final DemoStepData data;
+  final bool active;
+  final bool current;
+
+  const DemoRideStepChip({
+    required this.data,
+    required this.active,
+    required this.current,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = current ? kGold : active ? kGreenSoft : const Color(0xFF65717D);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: current ? 28 : 23,
+          height: current ? 28 : 23,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color.withOpacity(current ? .18 : .08),
+            border: Border.all(color: color.withOpacity(current ? .55 : .24)),
+            boxShadow: current
+                ? [
+                    BoxShadow(color: color.withOpacity(.16), blurRadius: 18),
+                  ]
+                : null,
+          ),
+          child: Icon(data.icon, color: color, size: current ? 15 : 13),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          data.label,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: color,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DemoRidePrimaryButton extends StatelessWidget {
+  const DemoRidePrimaryButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DemoRideScope.of(context);
+    final step = scope.step;
+
+    return NeonButton(
+      label: step.cta,
+      onTap: () {
+        final next = step.next;
+        scope.onStepChanged(next);
+
+        switch (next) {
+          case DemoRideStep.searching:
+            DemoFeedback.show(
+              context,
+              title: 'הקריאה נפתחה',
+              message: 'המערכת סורקת נהגים זמינים באזור ומחשבת אמון, זמן ומרחק.',
+              icon: Icons.radar_rounded,
+              accent: kGreenSoft,
+            );
+            break;
+          case DemoRideStep.offers:
+            DemoFeedback.show(
+              context,
+              title: 'נמצאו 3 הצעות',
+              message: 'הנהגים דורגו לפי זמן הגעה, מדד אמון ודירוג לקוחות.',
+              icon: Icons.groups_rounded,
+              accent: kGold,
+            );
+            break;
+          case DemoRideStep.selected:
+            DemoFeedback.show(
+              context,
+              title: 'נהג נבחר',
+              message: 'רפי כהן נבחר כנהג מומלץ. פרטי הנסיעה ננעלו בדמו.',
+              icon: Icons.verified_rounded,
+              accent: kGold,
+            );
+            break;
+          case DemoRideStep.enRoute:
+            DemoFeedback.show(
+              context,
+              title: 'הנהג בדרך',
+              message: 'הלקוח מקבל עדכון חי, והנהג רואה מסלול קריאה ברור.',
+              icon: Icons.local_taxi_rounded,
+              accent: kGreenSoft,
+            );
+            break;
+          case DemoRideStep.idle:
+            DemoFeedback.show(
+              context,
+              title: 'הדמו אופס',
+              message: 'אפשר להציג שוב את זרימת הקריאה מההתחלה.',
+              icon: Icons.restart_alt_rounded,
+              accent: kGreenSoft,
+            );
+            break;
+        }
+      },
+    );
+  }
+}
+
 
 class CustomerRideSummary extends StatelessWidget {
   const CustomerRideSummary({super.key});
