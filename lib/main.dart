@@ -62,6 +62,7 @@ Image premiumAssetImage(
 // TRUST_HEADER_CLEANUP_01: trust header does not repeat day/night state.
 // DEMO_ACTIVATION_PASS_01: default day mode and premium feedback for demo actions.
 // DEMO_ACTIVATION_PASS_02: customer demo has a live ride-request story state.
+// CORE_CALL_LAYER_V1: one live call state is reflected across all product surfaces.
 
 
 
@@ -634,6 +635,8 @@ class AdminControlPanel extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: const [
+            ActiveCallStatusStrip(surface: 'admin'),
+            SizedBox(height: 12),
             AdminOpsMetrics(),
             SizedBox(height: 12),
             AdminOpsChart(),
@@ -1263,6 +1266,8 @@ class ZoneOperationsPanel extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: const [
+            ActiveCallStatusStrip(surface: 'zone'),
+            SizedBox(height: 12),
             SizedBox(height: 244, child: ZoneMapCanvas()),
             SizedBox(height: 12),
             ZoneStatsStrip(),
@@ -1595,6 +1600,8 @@ class TrustAssurancePanel extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: const [
+            ActiveCallStatusStrip(surface: 'trust'),
+            SizedBox(height: 12),
             TrustScoreHero(),
             SizedBox(height: 12),
             TrustProofGrid(),
@@ -2217,6 +2224,8 @@ class DriverWorkPanel extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: const [
+            ActiveCallStatusStrip(surface: 'driver'),
+            SizedBox(height: 12),
             DriverLiveStatusCard(),
             SizedBox(height: 12),
             SizedBox(height: 218, child: LiveMapCanvas()),
@@ -2575,6 +2584,8 @@ class CustomerRequestPanel extends StatelessWidget {
             SizedBox(height: 12),
             CustomerRideSummary(),
             SizedBox(height: 10),
+            ActiveCallStatusStrip(surface: 'customer'),
+            SizedBox(height: 10),
             DemoRideProgressStrip(),
             SizedBox(height: 12),
             SizedBox(
@@ -2743,6 +2754,157 @@ class DemoRidePrimaryButton extends StatelessWidget {
       },
     );
   }
+}
+
+
+
+class ActiveCallStatusStrip extends StatelessWidget {
+  final String surface;
+
+  const ActiveCallStatusStrip({
+    required this.surface,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = DemoRideScope.of(context);
+    final step = scope.step;
+
+    final surfaceText = switch (surface) {
+      'customer' => 'הקריאה שלי',
+      'driver' => 'קריאה לעבודה',
+      'zone' => 'אזור חי',
+      'admin' => 'שליטה',
+      'trust' => 'ביטחון ואימות',
+      _ => 'קריאה חיה',
+    };
+
+    final message = switch (surface) {
+      'customer' => _customerMessage(step),
+      'driver' => _driverMessage(step),
+      'zone' => _zoneMessage(step),
+      'admin' => _adminMessage(step),
+      'trust' => _trustMessage(step),
+      _ => step.title,
+    };
+
+    final icon = switch (step) {
+      DemoRideStep.idle => Icons.radio_button_unchecked_rounded,
+      DemoRideStep.searching => Icons.radar_rounded,
+      DemoRideStep.offers => Icons.groups_rounded,
+      DemoRideStep.selected => Icons.verified_rounded,
+      DemoRideStep.enRoute => Icons.local_taxi_rounded,
+    };
+
+    final accent = step == DemoRideStep.idle ? const Color(0xFF8793A0) : step == DemoRideStep.offers || step == DemoRideStep.selected ? kGold : kGreenSoft;
+
+    return GlassPanel(
+      radius: 16,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: accent.withOpacity(.10),
+                border: Border.all(color: accent.withOpacity(.30)),
+              ),
+              child: Icon(icon, color: accent, size: 18),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    surfaceText,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    message,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFFAEB8C3),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: accent.withOpacity(.11),
+                border: Border.all(color: accent.withOpacity(.28)),
+              ),
+              child: Text(
+                step.title,
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _customerMessage(DemoRideStep step) => switch (step) {
+        DemoRideStep.idle => 'פתח קריאה כדי להפעיל את המערכת.',
+        DemoRideStep.searching => 'המערכת מחפשת נהגים זמינים באזור.',
+        DemoRideStep.offers => 'נמצאו נהגים מתאימים לבחירה.',
+        DemoRideStep.selected => 'נהג מתאים נבחר לפי זמן ואמון.',
+        DemoRideStep.enRoute => 'הנהג בדרך לאיסוף.',
+      };
+
+  static String _driverMessage(DemoRideStep step) => switch (step) {
+        DemoRideStep.idle => 'מחכה לקריאה חדשה.',
+        DemoRideStep.searching => 'קריאה חדשה מחפשת נהג מתאים.',
+        DemoRideStep.offers => 'הקריאה זמינה לנהגים באזור.',
+        DemoRideStep.selected => 'הנהג נבחר לקריאה.',
+        DemoRideStep.enRoute => 'הנהג מתקדם לאיסוף.',
+      };
+
+  static String _zoneMessage(DemoRideStep step) => switch (step) {
+        DemoRideStep.idle => 'האזור מוכן לקריאות.',
+        DemoRideStep.searching => 'קריאה חדשה נכנסה לאזור.',
+        DemoRideStep.offers => 'המערכת מאתרת הצעות באזור חי.',
+        DemoRideStep.selected => 'שיבוץ הנהג מעדכן את המרחב.',
+        DemoRideStep.enRoute => 'הקריאה פעילה במרחב.',
+      };
+
+  static String _adminMessage(DemoRideStep step) => switch (step) {
+        DemoRideStep.idle => 'אין קריאה פעילה בדמו.',
+        DemoRideStep.searching => 'קריאה חדשה נפתחה במערכת.',
+        DemoRideStep.offers => 'נמצאו הצעות לשיבוץ.',
+        DemoRideStep.selected => 'נהג נבחר ונרשם בלוח הבקרה.',
+        DemoRideStep.enRoute => 'קריאה פעילה במעקב.',
+      };
+
+  static String _trustMessage(DemoRideStep step) => switch (step) {
+        DemoRideStep.idle => 'שכבת האמון מוכנה לבדיקה.',
+        DemoRideStep.searching => 'המערכת בודקת נהגים זמינים.',
+        DemoRideStep.offers => 'הצעות מסוננות לפי אמון.',
+        DemoRideStep.selected => 'הנהג עבר אימות והתאמה.',
+        DemoRideStep.enRoute => 'הקריאה מתנהלת עם שכבת אמון פעילה.',
+      };
 }
 
 
