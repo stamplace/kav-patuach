@@ -59,6 +59,7 @@ Image premiumAssetImage(
 // USE_CASE_PASS_03_ZONE: zone tab is a clear live operations surface.
 // USE_CASE_PASS_04_ADMIN: admin tab is a clear operations control surface.
 // USE_CASE_PASS_05_TRUST: trust tab is a clear assurance and verification surface.
+// TRUST_HEADER_CLEANUP_01: trust header does not repeat day/night state.
 
 
 
@@ -1465,9 +1466,6 @@ class TrustActionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mode = VisualModeScope.maybeOf(context);
-    final isDay = mode == VisualMode.day;
-
     return GlassPanel(
       radius: 20,
       child: Padding(
@@ -1506,46 +1504,8 @@ class TrustActionHeader extends StatelessWidget {
                 ],
               ),
             ),
-            TrustModePill(isDay: isDay),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TrustModePill extends StatelessWidget {
-  final bool isDay;
-
-  const TrustModePill({
-    required this.isDay,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isDay ? kGreenSoft : kGold;
-    final icon = isDay ? Icons.light_mode_rounded : Icons.nights_stay_rounded;
-    final label = isDay ? 'יום' : 'לילה';
-
-    return Container(
-      height: 32,
-      padding: const EdgeInsets.symmetric(horizontal: 11),
-      decoration: BoxDecoration(
-        color: color.withOpacity(.11),
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: color.withOpacity(.34)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 14),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w900),
-          ),
-        ],
       ),
     );
   }
