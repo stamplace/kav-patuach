@@ -60,6 +60,7 @@ Image premiumAssetImage(
 // USE_CASE_PASS_04_ADMIN: admin tab is a clear operations control surface.
 // USE_CASE_PASS_05_TRUST: trust tab is a clear assurance and verification surface.
 // TRUST_HEADER_CLEANUP_01: trust header does not repeat day/night state.
+// DEMO_ACTIVATION_PASS_01: default day mode and premium feedback for demo actions.
 
 
 
@@ -275,7 +276,7 @@ class AppHome extends StatefulWidget {
 
 class _AppHomeState extends State<AppHome> {
   int selected = 3;
-  VisualMode visualMode = VisualMode.night;
+  VisualMode visualMode = VisualMode.day;
   bool _didPrecacheAssets = false;
 
   @override
@@ -3472,6 +3473,155 @@ class CallRow extends StatelessWidget {
   }
 }
 
+
+class DemoFeedback {
+  static void show(
+    BuildContext context, {
+    required String title,
+    required String message,
+    IconData icon = Icons.check_circle_rounded,
+    Color accent = kGreenSoft,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.38),
+      builder: (sheetContext) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 0, 14, 18),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    const Color(0xFF07111D).withOpacity(.96),
+                    const Color(0xFF020711).withOpacity(.94),
+                  ],
+                ),
+                border: Border.all(color: accent.withOpacity(.32)),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(.48), blurRadius: 28, offset: const Offset(0, 14)),
+                  BoxShadow(color: accent.withOpacity(.10), blurRadius: 34),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: accent.withOpacity(.11),
+                      border: Border.all(color: accent.withOpacity(.30)),
+                    ),
+                    child: Icon(icon, color: accent, size: 23),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          message,
+                          style: const TextStyle(
+                            color: Color(0xFFAEB8C3),
+                            fontSize: 12,
+                            height: 1.35,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () => Navigator.of(sheetContext).pop(),
+                    child: Container(
+                      height: 34,
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: accent.withOpacity(.12),
+                        border: Border.all(color: accent.withOpacity(.28)),
+                      ),
+                      child: Text(
+                        'סגור',
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static void byLabel(BuildContext context, String label) {
+    switch (label) {
+      case 'פתח קריאה':
+        show(
+          context,
+          title: 'הקריאה נפתחה',
+          message: 'המערכת מחפשת נהגים זמינים באזור ומדרגת אותם לפי אמון, זמן ומרחק.',
+          icon: Icons.near_me_rounded,
+          accent: kGreenSoft,
+        );
+        return;
+      case 'קבל':
+        show(
+          context,
+          title: 'הקריאה התקבלה',
+          message: 'הנהג קיבל את הקריאה, המסלול נשמר והלקוח יקבל עדכון מיידי.',
+          icon: Icons.local_taxi_rounded,
+          accent: kGold,
+        );
+        return;
+      case 'בחר הצעה':
+        show(
+          context,
+          title: 'הצעה נבחרה',
+          message: 'המערכת נעלה נהג מומלץ לפי מדד אמון, זמן הגעה ודירוג.',
+          icon: Icons.verified_rounded,
+          accent: kGold,
+        );
+        return;
+      default:
+        show(
+          context,
+          title: label,
+          message: 'פעולה זמינה בדמו. בשלב המוצר הבא היא תחובר לשרת ולנתונים חיים.',
+          icon: Icons.touch_app_rounded,
+          accent: kGreenSoft,
+        );
+    }
+  }
+}
+
+
+
 class AppInput extends StatelessWidget {
   final String label;
 
@@ -3479,22 +3629,39 @@ class AppInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassPanel(
-      height: 46,
-      radius: 22,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Row(
-          children: [
-            const Icon(Icons.location_on_rounded, color: kGreen),
-            const SizedBox(width: 10),
-            Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-          ],
+    return GestureDetector(
+      onTap: () => DemoFeedback.show(
+        context,
+        title: label,
+        message: 'בדמו זה שדה פעיל. בשלב הבא נחבר בחירת כתובת, מיקום נוכחי והשלמה אוטומטית.',
+        icon: Icons.location_on_rounded,
+        accent: kGreenSoft,
+      ),
+      child: GlassPanel(
+        height: 46,
+        radius: 22,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            children: [
+              const Icon(Icons.location_on_rounded, color: kGreen),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                ),
+              ),
+              const Icon(Icons.chevron_left_rounded, color: Color(0xFF8793A0), size: 18),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 
 class SegmentRow extends StatelessWidget {
   const SegmentRow({super.key});
@@ -3511,6 +3678,7 @@ class SegmentRow extends StatelessWidget {
   }
 }
 
+
 class SegmentButton extends StatelessWidget {
   final String label;
   final bool active;
@@ -3519,25 +3687,35 @@ class SegmentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: active ? kGreen.withOpacity(.10) : Colors.black.withOpacity(.28),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: active ? kGreenSoft : Colors.white.withOpacity(.1)),
+    return GestureDetector(
+      onTap: () => DemoFeedback.show(
+        context,
+        title: 'בחירת זמן',
+        message: 'נבחר: $label. בדמו הבא הבחירה תשנה את מסלול הקריאה ואת זמינות הנהגים.',
+        icon: active ? Icons.schedule_rounded : Icons.calendar_month_rounded,
+        accent: active ? kGreenSoft : kGold,
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: active ? Colors.white : const Color(0xFF8793A0),
-          fontSize: 14,
-          fontWeight: FontWeight.w800,
+      child: Container(
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: active ? kGreen.withOpacity(.10) : Colors.black.withOpacity(.28),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: active ? kGreenSoft : Colors.white.withOpacity(.1)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.white : const Color(0xFF8793A0),
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
   }
 }
+
 
 class MetricGrid extends StatelessWidget {
   const MetricGrid({super.key});
@@ -3703,38 +3881,49 @@ class GlassPanel extends StatelessWidget {
   }
 }
 
+
 class NeonButton extends StatelessWidget {
   final String label;
   final bool compact;
+  final VoidCallback? onTap;
 
   const NeonButton({
     required this.label,
     this.compact = false,
+    this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: compact ? 38 : 50,
-      padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: const LinearGradient(colors: [Color(0xFF13C783), Color(0xFF5EEAB0)]),
-        boxShadow: [BoxShadow(color: kGreen.withOpacity(.10), blurRadius: 20, offset: Offset(0, 7))],
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: TextStyle(
-          color: const Color(0xFF03120B),
-          fontSize: compact ? 14 : 17,
-          fontWeight: FontWeight.w900,
+    return GestureDetector(
+      onTap: onTap ?? () => DemoFeedback.byLabel(context, label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        height: compact ? 38 : 50,
+        padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 22),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: const LinearGradient(colors: [Color(0xFF13C783), Color(0xFF5EEAB0)]),
+          boxShadow: [
+            BoxShadow(color: kGreen.withOpacity(.13), blurRadius: 22, offset: const Offset(0, 8)),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: const Color(0xFF03120B),
+            fontSize: compact ? 14 : 17,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ),
     );
   }
 }
+
 
 class GlassLabel extends StatelessWidget {
   final String label;
